@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -29,10 +30,8 @@ public class ActionHelper {
     public static void startNowPlayingActivityIfNeeded(Activity activity, Intent intent) {
         if (intent != null && intent.getBooleanExtra(EXTRA_START_NOW_PLAYING, false)) {
             Intent nowPlayingIntent = new Intent(activity, NowPlayingActivity.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP |
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    .putExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION,
-                            intent.getParcelableExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION));
+                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .putExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION, (Bundle) intent.getParcelableExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION));
             activity.startActivity(nowPlayingIntent);
         }
     }

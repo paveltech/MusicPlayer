@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
@@ -364,9 +365,10 @@ public class MediaPlayback implements Playback {
     }
 
     private final class ExoPlayerEventListener implements ExoPlayer.EventListener {
+
         @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
-            // Nothing to do.
+        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
+
         }
 
         @Override
@@ -422,8 +424,8 @@ public class MediaPlayback implements Playback {
         }
 
         @Override
-        public void onPositionDiscontinuity() {
-            // Nothing to do.
+        public void onPositionDiscontinuity(int reason) {
+
         }
 
         @Override
@@ -432,8 +434,18 @@ public class MediaPlayback implements Playback {
         }
 
         @Override
+        public void onSeekProcessed() {
+
+        }
+
+        @Override
         public void onRepeatModeChanged(int repeatMode) {
             // Nothing to do.
+        }
+
+        @Override
+        public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
         }
     }
 }
