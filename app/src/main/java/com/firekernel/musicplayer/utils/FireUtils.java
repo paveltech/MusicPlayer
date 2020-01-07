@@ -2,7 +2,7 @@ package com.firekernel.musicplayer.utils;
 
 import android.app.Activity;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 
 /**
  * Created by Ashish on 5/18/2017.

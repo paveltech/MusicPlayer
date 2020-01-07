@@ -1,6 +1,6 @@
 package com.firekernel.musicplayer.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Utility class to help on queue related tasks.

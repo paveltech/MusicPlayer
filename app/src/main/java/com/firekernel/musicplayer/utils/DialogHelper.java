@@ -3,7 +3,7 @@ package com.firekernel.musicplayer.utils;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * Created by Ashish on 8/3/2017.
