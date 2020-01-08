@@ -28,9 +28,10 @@ public class PlaybackControlsFragment extends Fragment {
         @Override
         public void onClick(View v) {
             MediaControllerCompat controller = MediaControllerCompat.getMediaController(getActivity());
+
+
             PlaybackStateCompat stateObj = controller.getPlaybackState();
-            final int state = stateObj == null ?
-                    PlaybackStateCompat.STATE_NONE : stateObj.getState();
+            final int state = stateObj == null ? PlaybackStateCompat.STATE_NONE : stateObj.getState();
             FireLog.d(TAG, "onClick, in state " + state);
             switch (v.getId()) {
                 case R.id.playPause:

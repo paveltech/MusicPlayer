@@ -10,6 +10,7 @@ import android.net.wifi.WifiManager;
 import androidx.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.firekernel.musicplayer.FireApplication;
 import com.firekernel.musicplayer.utils.FireLog;
@@ -18,6 +19,7 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioAttributes;
@@ -26,9 +28,13 @@ import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -63,6 +69,8 @@ public class MediaPlayback implements Playback {
     // Type of audio focus we have:
     private int currentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
     private SimpleExoPlayer simpleExoPlayer;
+
+
     private final BroadcastReceiver audioNoisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -194,15 +202,23 @@ public class MediaPlayback implements Playback {
             releaseResources(false); // release everything except the player
 
             String source = null;
-            if (item.getDescription().getMediaUri() != null)
+            if (item.getDescription().getMediaUri() != null){
                 source = item.getDescription().getMediaUri().toString();
-            if (source != null && (source.contains("www") || source.contains("http"))) {
-                source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
             }
 
             if (simpleExoPlayer == null) {
-                simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(
-                        context, new DefaultTrackSelector(), new DefaultLoadControl());
+
+
+                //simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector(), new DefaultLoadControl());
+
+
+                BandwidthMeter bandwidthMeter =  new DefaultBandwidthMeter();
+                AdaptiveTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+                DefaultTrackSelector trackSelector = new  DefaultTrackSelector(videoTrackSelectionFactory);
+
+
+                // 2. Create the player
+                simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
                 simpleExoPlayer.addListener(exoPlayerEventListener);
             }
 
@@ -217,19 +233,28 @@ public class MediaPlayback implements Playback {
                     .build();
             simpleExoPlayer.setAudioAttributes(audioAttributes);
 
+
+
             // Produces DataSource instances through which media data is loaded.
-            DataSource.Factory dataSourceFactory =
-                    new DefaultDataSourceFactory(
-                            context, Util.getUserAgent(context, "fire_play"), null);
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "fire_play"), null);
             // Produces Extractor instances for parsing the media data.
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
             // The MediaSource represents the media to be played.
-            MediaSource mediaSource =
-                    new ExtractorMediaSource(
-                            Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
 
+            /**
+             *  this one for other type media play
+             *
+             */
+            //MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(source), dataSourceFactory, extractorsFactory, null, null);
+
+            /**
+             *  this type is only for HLS support
+             *
+             */
+            MediaSource mediaSource = new HlsMediaSource(Uri.parse(source) , dataSourceFactory  ,  null , null);
             // Prepares media to play (happens on background thread) and triggers
             // {@code onPlayerStateChanged} callback when the stream is ready to play.
+
             simpleExoPlayer.prepare(mediaSource);
 
             // If we are streaming from the internet, we want to hold a
@@ -420,6 +445,7 @@ public class MediaPlayback implements Playback {
 
             if (callback != null) {
                 callback.onError("ExoPlayer error " + what);
+                Log.d("MEDIA_PLAY: " , ""+what);
             }
         }
 

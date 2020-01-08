@@ -11,6 +11,9 @@ import android.support.v4.media.MediaBrowserCompat;
  */
 
 public class MediaItemWrapper implements Parcelable{
+
+
+
     public static final Creator<MediaItemWrapper> CREATOR = new Creator<MediaItemWrapper>() {
         @Override
         public MediaItemWrapper createFromParcel(Parcel in) {

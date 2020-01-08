@@ -42,6 +42,8 @@ public class RemoteSource implements MusicProviderSource {
             int slashPos = CATALOG_URL.lastIndexOf('/');
             String path = CATALOG_URL.substring(0, slashPos + 1);
             JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
+
+
             ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
             if (jsonObj != null) {
                 JSONArray jsonTracks = jsonObj.getJSONArray(JSON_MUSIC);
@@ -88,11 +90,14 @@ public class RemoteSource implements MusicProviderSource {
         // mediaSession.setMetadata) is not a good idea for a real world music app, because
         // the session metadata can be accessed by notification listeners. This is done in this
         // sample for convenience only.
+
+
         //noinspection ResourceType
         return new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
 //                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
+                //.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, "https://vod.rockerzs.com/music/numb/master.m3u8")
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
