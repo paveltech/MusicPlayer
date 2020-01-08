@@ -14,7 +14,6 @@ import com.firekernel.musicplayer.R;
 import com.firekernel.musicplayer.model.MediaItemWrapper;
 import com.firekernel.musicplayer.ui.MediaCategoryActivity;
 import com.firekernel.musicplayer.ui.NowPlayingActivity;
-import com.firekernel.musicplayer.ui.SearchActivity;
 
 import java.io.File;
 
@@ -49,16 +48,6 @@ public class ActionHelper {
         activity.startActivity(intent);
     }
 
-    public static void startSearchActivity(Activity activity) {
-        Intent intent = new Intent(activity, SearchActivity.class);
-        activity.startActivity(intent);
-    }
-
-    public static void returnToSearchActivity(Activity activity) {
-        Intent intent = new Intent(activity, SearchActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        activity.startActivity(intent);
-    }
 
     public static void startAudioEffectActivity(Activity activity) {
         try {

@@ -44,6 +44,8 @@ public class MediaNotificationManager extends BroadcastReceiver {
     public static final String ACTION_PREV = "com.firekernel.player.prev";
     public static final String ACTION_NEXT = "com.firekernel.player.next";
     public static final String ACTION_STOP = "com.firekernel.player.stop";
+
+
     private static final String TAG = FireLog.makeLogTag(MediaNotificationManager.class);
 
     private static final String CHANNEL_ID = "com.firekernel.player.MUSIC_CHANNEL_ID";

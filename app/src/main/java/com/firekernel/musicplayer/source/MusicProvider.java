@@ -35,21 +35,23 @@ public class MusicProvider {
     //only  playable music list, gets updated only when medialist is playable
     // used by updatemetadata while playing
     private final CopyOnWriteArrayList<MediaMetadataCompat> musicList;
+
+
     // media list contains browsable + playable media items
-
-
     private final CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
+
+
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private MusicProviderSource localSource;
+
+
     private MusicProviderSource remoteSource;
 
     private MusicProvider() {
         // not following the adapter pattern
-        this( new LocalSource() , new RemoteSource());
+        this(new RemoteSource());
     }
 
-    private MusicProvider(MusicProviderSource localSource, MusicProviderSource remoteSource) {
-        this.localSource = localSource;
+    private MusicProvider(MusicProviderSource remoteSource) {
         this.remoteSource = remoteSource;
         musicList = new CopyOnWriteArrayList<>();
         mediaList = new CopyOnWriteArrayList<>();

@@ -14,18 +14,15 @@ import android.util.Log;
 
 import com.firekernel.musicplayer.FireApplication;
 import com.firekernel.musicplayer.utils.FireLog;
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -44,8 +41,6 @@ import static com.google.android.exoplayer2.C.USAGE_MEDIA;
 
 public class MediaPlayback implements Playback {
 
-    // The volume we set the media player to when we lose audio focus, but are
-    // allowed to reduce the volume instead of stopping playback.
     private static final float VOLUME_DUCK = 0.2f;
     // The volume we set the media player when we have audio focus.
     private static final float VOLUME_NORMAL = 1.0f;

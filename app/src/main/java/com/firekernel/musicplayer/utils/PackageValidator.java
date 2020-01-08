@@ -25,8 +25,7 @@ public class PackageValidator {
     private final Map<String, ArrayList<CallerInfo>> validCertificates;
 
     public PackageValidator(Context ctx) {
-        validCertificates = readValidCertificates(ctx.getResources().getXml(
-                R.xml.allowed_media_browser_callers));
+        validCertificates = readValidCertificates(ctx.getResources().getXml(R.xml.allowed_media_browser_callers));
     }
 
     private Map<String, ArrayList<CallerInfo>> readValidCertificates(XmlResourceParser parser) {

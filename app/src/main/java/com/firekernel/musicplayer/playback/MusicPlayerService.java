@@ -139,6 +139,8 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         // Returning null = no one can connect
 
         PackageValidator packageValidator = new PackageValidator(this);
+
+
         if (!packageValidator.isCallerAllowed(this, clientPackageName, clientUid)) {
             return new MediaBrowserServiceCompat.BrowserRoot(MEDIA_ID_EMPTY_ROOT, null);
         }

@@ -18,7 +18,6 @@ import com.firekernel.musicplayer.playback.MediaBrowserProvider;
 import com.firekernel.musicplayer.playback.MusicPlayerService;
 import com.firekernel.musicplayer.ui.fragment.PlaybackControlsFragment;
 import com.firekernel.musicplayer.utils.FireLog;
-import com.firekernel.musicplayer.utils.PermissionHelper;
 import com.firekernel.musicplayer.utils.ResourceHelper;
 
 /**
@@ -87,7 +86,7 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
             setTaskDescription(taskDesc);
         }
 
-        PermissionHelper.requestPermission(this);
+
 
         // Connect a media browser just to get the media session token. There are other ways
         // this can be done, for example by sharing the session token directly.
@@ -98,10 +97,6 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
         mediaBrowser.connect();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        PermissionHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-    }
 
     @Override
     protected void onStart() {
