@@ -137,6 +137,8 @@ public class QueueManager {
             return;
         }
         final String musicId = MediaIDHelper.extractMusicIDFromMediaID(currentMusic.getDescription().getMediaId());
+
+
         MediaMetadataCompat metadata = musicProvider.getMusic(musicId);
         if (metadata == null) {
             throw new IllegalArgumentException("Invalid musicId " + musicId);

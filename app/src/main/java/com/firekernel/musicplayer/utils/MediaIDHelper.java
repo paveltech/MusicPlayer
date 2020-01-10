@@ -7,18 +7,20 @@ import androidx.annotation.NonNull;
  */
 public class MediaIDHelper {
 
-    // Media IDs used on browse items of MediaBrowser
-    public static final String MEDIA_ID_EMPTY_ROOT = "_EMPTY_ROOT_";
-    public static final String MEDIA_ID_ROOT = "_ROOT_";
-    public static final String MEDIA_ID_PLAYLIST = "_BY_PLAYLIST_";
+
+
     public static final String MEDIA_ID_TRACKS = "_BY_TRACK_"; // track is special category where no further subcategory
     public static final String MEDIA_ID_TRACKS_ALL = "_ALL_TRACK_"; // use this for subcategory for track
+
+    /*
     public static final String MEDIA_ID_ALBUM = "_BY_ALBUM_";
     public static final String MEDIA_ID_ARTIST = "_BY_ARTIST_";
     public static final String MEDIA_ID_GENRE = "_BY_GENRE_";
     public static final String MEDIA_ID_FOLDER = "_BY_FOLDER_";
     public static final String SINGLE_PLAY = "play ";
     public static final String MEDIA_ID_SEARCH = "_SEARCH_";
+
+     */
 
     private static final char CATEGORY_SEPARATOR = ',';
     private static final char LEAF_SEPARATOR = '|';

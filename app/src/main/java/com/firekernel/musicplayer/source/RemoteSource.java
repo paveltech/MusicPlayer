@@ -45,6 +45,7 @@ public class RemoteSource implements MusicProviderSource {
 
 
             ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
+
             if (jsonObj != null) {
                 JSONArray jsonTracks = jsonObj.getJSONArray(JSON_MUSIC);
 

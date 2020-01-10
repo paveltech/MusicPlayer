@@ -19,11 +19,7 @@ import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.PackageValidator;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_EMPTY_ROOT;
-import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_ROOT;
 
 public class MusicPlayerService extends MediaBrowserServiceCompat implements
         PlaybackManager.MusicPlayerServiceCallback {
@@ -141,29 +137,26 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         PackageValidator packageValidator = new PackageValidator(this);
 
 
+        /*
         if (!packageValidator.isCallerAllowed(this, clientPackageName, clientUid)) {
             return new MediaBrowserServiceCompat.BrowserRoot(MEDIA_ID_EMPTY_ROOT, null);
         }
 
-        return new BrowserRoot(MEDIA_ID_ROOT, null); // Name visible in Android Auto
+         */
+
+        return new BrowserRoot("_ROOT_", null); // Name visible in Android Auto
     }
 
     @Override
     public void onLoadChildren(@NonNull final String parentMediaId,
                                @NonNull final Result<List<MediaItem>> result) {
-        FireLog.d(TAG, "(++) onLoadChildren: parentMediaId=" + parentMediaId);
-        if (MEDIA_ID_EMPTY_ROOT.equals(parentMediaId)) {
-            result.sendResult(new ArrayList<MediaItem>());
-        } else {
-            // return results when the music library is retrieved
-            result.detach();
-            musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
-                @Override
-                public void onMusicCatalogReady(boolean success) {
-                    result.sendResult(musicProvider.getChildren(parentMediaId));
-                }
-            });
-        }
+        result.detach();
+        musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
+            @Override
+            public void onMusicCatalogReady(boolean success) {
+                result.sendResult(musicProvider.getChildren(parentMediaId));
+            }
+        });
     }
 
     @Override

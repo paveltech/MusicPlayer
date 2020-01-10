@@ -3,17 +3,23 @@ package com.firekernel.musicplayer.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.navigation.NavigationView;
+
 import androidx.fragment.app.Fragment;
+
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -111,6 +117,7 @@ public class MainActivity extends PlaybackBaseActivity implements
 
     @Override
     protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         FireLog.d(TAG, "(++) onNewIntent, intent=" + intent);
         ActionHelper.startNowPlayingActivityIfNeeded(this, intent);
     }
@@ -290,41 +297,14 @@ public class MainActivity extends PlaybackBaseActivity implements
         String tag = null;
 
         switch (id) {
-            case R.id.nav_header:
-                title = getResources().getString(R.string.nav_menu_login);
-                fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS);
-                unCheckAllMenuItems(navigationView);
-                break;
-            case R.id.nav_playlist:
-                title = getResources().getString(R.string.nav_menu_playlists);
-                fragment = CategoryFragment.newInstance(title, MediaIDHelper.MEDIA_ID_PLAYLIST);
-                tag = CategoryFragment.TAG;
-                break;
+
+
             case R.id.nav_tracks:
                 title = getResources().getString(R.string.nav_menu_tracks);
                 fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS);
                 tag = MediaListFragment.TAG;
                 break;
-            case R.id.nav_albums:
-                title = getResources().getString(R.string.nav_menu_albums);
-                fragment = CategoryFragment.newInstance(title, MediaIDHelper.MEDIA_ID_ALBUM);
-                tag = CategoryFragment.TAG;
-                break;
-            case R.id.nav_artists:
-                title = getResources().getString(R.string.nav_menu_artists);
-                fragment = CategoryFragment.newInstance(title, MediaIDHelper.MEDIA_ID_ARTIST);
-                tag = CategoryFragment.TAG;
-                break;
-            case R.id.nav_genres:
-                title = getResources().getString(R.string.nav_menu_genre);
-                fragment = CategoryFragment.newInstance(title, MediaIDHelper.MEDIA_ID_GENRE);
-                tag = CategoryFragment.TAG;
-                break;
-            case R.id.nav_folders:
-                title = getResources().getString(R.string.nav_menu_folders);
-                fragment = CategoryFragment.newInstance(title, MediaIDHelper.MEDIA_ID_FOLDER);
-                tag = CategoryFragment.TAG;
-                break;
+
         }
 
         for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
