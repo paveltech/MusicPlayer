@@ -58,7 +58,9 @@ public class MediaListFragment extends Fragment {
     }
 
     public static MediaListFragment newInstance(String title, String mediaId) {
+
         MediaListFragment fragment = new MediaListFragment();
+
         Bundle args = new Bundle();
         args.putString(TITLE, title);
         args.putString(EXTRA_MEDIA_ID, mediaId);
@@ -95,10 +97,15 @@ public class MediaListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_media_list, container, false);
 
         adapter = new MediaListAdapter(getContext(), mediaItems);
+
+
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+
+
+
         getActivity().setTitle(title);
         return view;
     }

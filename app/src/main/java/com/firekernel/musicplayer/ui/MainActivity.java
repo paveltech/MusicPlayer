@@ -28,7 +28,6 @@ import android.widget.ImageView;
 
 import com.firekernel.musicplayer.FirePopupMenuSelectedListener;
 import com.firekernel.musicplayer.R;
-import com.firekernel.musicplayer.ui.fragment.CategoryFragment;
 import com.firekernel.musicplayer.ui.fragment.MediaListFragment;
 import com.firekernel.musicplayer.ui.fragment.PlaybackControlsFragment;
 import com.firekernel.musicplayer.utils.ActionHelper;
@@ -38,7 +37,6 @@ import com.firekernel.musicplayer.utils.MediaIDHelper;
 
 public class MainActivity extends PlaybackBaseActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        CategoryFragment.OnCategorySelectedListener,
         MediaListFragment.OnMediaItemSelectedListener,
         FirePopupMenuSelectedListener {
 
@@ -52,6 +50,9 @@ public class MainActivity extends PlaybackBaseActivity implements
     private String title;
     private int itemId;
     private String mArtUrl = ""; //do not set null
+
+
+
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
         @Override
         public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
@@ -97,6 +98,7 @@ public class MainActivity extends PlaybackBaseActivity implements
         });
 
         loadNavigationHeaderView(headerView);
+
         if (savedInstanceState == null) {
             // Set the default view when activity is launched on the first time
             loadPrimaryView();
@@ -132,9 +134,6 @@ public class MainActivity extends PlaybackBaseActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        switch (id) {
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -162,11 +161,6 @@ public class MainActivity extends PlaybackBaseActivity implements
     @Override
     protected void onMediaControllerConnected() {
 
-        // connect CategoryFragment
-        Fragment fragmentCategory = getCategoryFragment();
-        if (fragmentCategory != null) {
-            ((CategoryFragment) fragmentCategory).onConnected();
-        }
 
         // connect MediaListFragment
         Fragment fragment = getMediaListFragment();
@@ -179,7 +173,6 @@ public class MainActivity extends PlaybackBaseActivity implements
             ((PlaybackControlsFragment) fragmentControl).onConnected();
         }
 
-        // connect activity to receive callback
         this.onConnected();
     }
 
@@ -190,25 +183,6 @@ public class MainActivity extends PlaybackBaseActivity implements
         return true;
     }
 
-    @Override
-    public void onCategorySelected(MediaBrowserCompat.MediaItem mediaItem) {
-        FireLog.d(TAG, "(++) onCategorySelected, mediaItem= " + mediaItem);
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(CategoryFragment.TAG);
-        if (fragment != null && fragment instanceof CategoryFragment) {
-            title = mediaItem.getDescription().getTitle() + "";
-            fragment = MediaListFragment.newInstance(title, mediaItem.getMediaId());
-            String tag = MediaListFragment.TAG;
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(
-                            R.anim.slide_in_from_right, R.anim.slide_out_to_left,
-                            R.anim.slide_in_from_left, R.anim.slide_out_to_right)
-                    .replace(R.id.flContent, fragment, tag)
-                    .addToBackStack(null)
-                    .commit();
-        }
-    }
 
     @Override
     public void onMediaItemSelected(MediaBrowserCompat.MediaItem item) {
@@ -234,9 +208,7 @@ public class MainActivity extends PlaybackBaseActivity implements
 //        ActionHelper.shareTrack(this, item.getDescription().getMediaId());
     }
 
-    private CategoryFragment getCategoryFragment() {
-        return (CategoryFragment) getSupportFragmentManager().findFragmentByTag(CategoryFragment.TAG);
-    }
+
 
     private MediaListFragment getMediaListFragment() {
         return (MediaListFragment) getSupportFragmentManager().findFragmentByTag(MediaListFragment.TAG);
@@ -310,7 +282,7 @@ public class MainActivity extends PlaybackBaseActivity implements
         for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
             getSupportFragmentManager().popBackStack();
         }
-        // Insert the fragment by replacing any existing fragment
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
