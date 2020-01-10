@@ -270,7 +270,6 @@ public class MainActivity extends PlaybackBaseActivity implements
 
         switch (id) {
 
-
             case R.id.nav_tracks:
                 title = getResources().getString(R.string.nav_menu_tracks);
                 fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS);

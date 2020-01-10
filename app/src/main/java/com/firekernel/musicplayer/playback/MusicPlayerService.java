@@ -12,11 +12,10 @@ import android.support.v4.media.MediaMetadataCompat;
 import androidx.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-
 import com.firekernel.musicplayer.R;
 import com.firekernel.musicplayer.source.MusicProvider;
 import com.firekernel.musicplayer.utils.FireLog;
-import com.firekernel.musicplayer.utils.PackageValidator;
+
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -34,6 +33,11 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     private MusicProvider musicProvider;
     private PlaybackManager playbackManager;
     private MediaSessionCompat session;
+    private MediaNotificationManager mediaNotificationManager;
+
+
+
+
     private QueueManager.MetadataUpdateListener metadataUpdateListener = new QueueManager.MetadataUpdateListener() {
 
         @Override
@@ -57,7 +61,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
             session.setQueue(newQueue);
         }
     };
-    private MediaNotificationManager mediaNotificationManager;
+
 
     @Override
     public void onCreate() {
@@ -128,28 +132,12 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     }
 
     @Override
-    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid,
-                                 Bundle rootHints) {
-        FireLog.d(TAG, "(++) onGetRoot: clientPackageName=" + clientPackageName +
-                "; clientUid=" + clientUid + " ; rootHints=" + rootHints);
-        // Returning null = no one can connect
-
-        PackageValidator packageValidator = new PackageValidator(this);
-
-
-        /*
-        if (!packageValidator.isCallerAllowed(this, clientPackageName, clientUid)) {
-            return new MediaBrowserServiceCompat.BrowserRoot(MEDIA_ID_EMPTY_ROOT, null);
-        }
-
-         */
-
-        return new BrowserRoot("_ROOT_", null); // Name visible in Android Auto
+    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, Bundle rootHints) {
+        return new BrowserRoot("_ROOT_", null);
     }
 
     @Override
-    public void onLoadChildren(@NonNull final String parentMediaId,
-                               @NonNull final Result<List<MediaItem>> result) {
+    public void onLoadChildren(@NonNull final String parentMediaId, @NonNull final Result<List<MediaItem>> result) {
         result.detach();
         musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
             @Override
@@ -159,15 +147,17 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         });
     }
 
+
+
     @Override
     public void onPlaybackStart() {
         FireLog.d(TAG, "(++) onPlaybackStart");
         session.setActive(true);
-
         delayedStopHandler.removeCallbacksAndMessages(null);
-
         startService(new Intent(getApplicationContext(), MusicPlayerService.class));
     }
+
+
 
     @Override
     public void onNotificationRequired() {

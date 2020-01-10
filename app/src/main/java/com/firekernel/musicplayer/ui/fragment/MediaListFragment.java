@@ -30,6 +30,8 @@ public class MediaListFragment extends Fragment {
     private static final String EXTRA_MEDIA_ID = "media_id";
 
     private MediaListAdapter adapter;
+
+
     private final MediaBrowserCompat.SubscriptionCallback subscriptionCallback = new MediaBrowserCompat.SubscriptionCallback() {
         @Override
         public void onChildrenLoaded(@NonNull String parentId,
@@ -48,6 +50,7 @@ public class MediaListFragment extends Fragment {
             Toast.makeText(getActivity(), R.string.error_loading_media, Toast.LENGTH_LONG).show();
         }
     };
+
     private List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
     private MediaBrowserProvider mediaBrowserProvider;
     private String title;
@@ -95,7 +98,6 @@ public class MediaListFragment extends Fragment {
                              Bundle savedInstanceState) {
         FireLog.d(TAG, "(++) onCreateView");
         View view = inflater.inflate(R.layout.fragment_media_list, container, false);
-
         adapter = new MediaListAdapter(getContext(), mediaItems);
 
 
@@ -148,6 +150,7 @@ public class MediaListFragment extends Fragment {
     // Called when the MediaBrowser is connected. This method is either called by the
     // fragment.onStart() or explicitly by the activity in the case where the connection
     // completes after the onStart()
+
     public void onConnected() {
         if (isDetached()) {
             return;

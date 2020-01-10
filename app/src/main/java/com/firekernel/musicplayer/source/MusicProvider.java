@@ -27,6 +27,7 @@ public class MusicProvider {
 
     //only  playable music list, gets updated only when medialist is playable
     // used by updatemetadata while playing
+
     private final CopyOnWriteArrayList<MediaMetadataCompat> musicList;
 
 
@@ -94,15 +95,18 @@ public class MusicProvider {
 
     public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
         FireLog.d(TAG, "(++) getChildren, mediaId=" + mediaId);
+
+
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
 
         if (mediaId.equals(MEDIA_ID_TRACKS)) {
+
             // fill the music List once and keep ever
             musicList.addAll(mediaList);
-
             for (MediaMetadataCompat metadata : getAllRetrievedMetadata()) {
                 mediaItems.add(createTracksMediaItem(metadata));
             }
+
         } else {
             FireLog.w(TAG, "unmatched mediaId: " + mediaId);
         }
@@ -122,9 +126,9 @@ public class MusicProvider {
         // can set a hierarchy-aware mediaID. We will need to know the media hierarchy
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
         // on where the music was selected from (by artist, by genre, random, etc)
+
+
         String hierarchyAwareMediaID = MediaIDHelper.createMediaID(metadata.getDescription().getMediaId(), MEDIA_ID_TRACKS, MEDIA_ID_TRACKS_ALL);
-
-
         MediaMetadataCompat copy = new MediaMetadataCompat.Builder(metadata)
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID)
                 .build();
