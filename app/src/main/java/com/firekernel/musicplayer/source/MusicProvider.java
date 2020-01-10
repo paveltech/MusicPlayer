@@ -14,8 +14,11 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_TRACKS;
+
+import timber.log.Timber;
+
 import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_TRACKS_ALL;
+
 
 /**
  * Simple data provider for music tracks. The actual metadata localSource is delegated to a
@@ -98,18 +101,12 @@ public class MusicProvider {
 
 
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
-
-        if (mediaId.equals(MEDIA_ID_TRACKS)) {
-
-            // fill the music List once and keep ever
-            musicList.addAll(mediaList);
-            for (MediaMetadataCompat metadata : getAllRetrievedMetadata()) {
-                mediaItems.add(createTracksMediaItem(metadata));
-            }
-
-        } else {
-            FireLog.w(TAG, "unmatched mediaId: " + mediaId);
+        // fill the music List once and keep ever
+        musicList.addAll(mediaList);
+        for (MediaMetadataCompat metadata : getAllRetrievedMetadata()) {
+            mediaItems.add(createTracksMediaItem(metadata));
         }
+
         return mediaItems;
     }
 
@@ -128,10 +125,11 @@ public class MusicProvider {
         // on where the music was selected from (by artist, by genre, random, etc)
 
 
-        String hierarchyAwareMediaID = MediaIDHelper.createMediaID(metadata.getDescription().getMediaId(), MEDIA_ID_TRACKS, MEDIA_ID_TRACKS_ALL);
-        MediaMetadataCompat copy = new MediaMetadataCompat.Builder(metadata)
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID)
-                .build();
+        String hierarchyAwareMediaID = MediaIDHelper.createMediaID(metadata.getDescription().getMediaId(), "", MEDIA_ID_TRACKS_ALL);
+        Timber.d("hierarch " +hierarchyAwareMediaID);
+
+        MediaMetadataCompat copy = new MediaMetadataCompat.Builder(metadata).putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID).build();
+
         return new MediaBrowserCompat.MediaItem(copy.getDescription(),
                 MediaBrowserCompat.MediaItem.FLAG_PLAYABLE);
 

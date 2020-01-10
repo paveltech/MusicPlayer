@@ -2,6 +2,8 @@ package com.firekernel.musicplayer.utils;
 
 import androidx.annotation.NonNull;
 
+import timber.log.Timber;
+
 /**
  * Utility class to help on queue related tasks.
  */
@@ -9,7 +11,7 @@ public class MediaIDHelper {
 
 
 
-    public static final String MEDIA_ID_TRACKS = "_BY_TRACK_"; // track is special category where no further subcategory
+    //public static final String MEDIA_ID_TRACKS = "_BY_TRACK_"; // track is special category where no further subcategory
     public static final String MEDIA_ID_TRACKS_ALL = "_ALL_TRACK_"; // use this for subcategory for track
 
     /*
@@ -56,6 +58,8 @@ public class MediaIDHelper {
         if (musicID != null) {
             sb.append(LEAF_SEPARATOR).append(musicID);
         }
+
+        Timber.d("media id: "+sb.toString());
         return sb.toString();
     }
 

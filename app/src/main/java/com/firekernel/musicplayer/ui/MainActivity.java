@@ -272,7 +272,7 @@ public class MainActivity extends PlaybackBaseActivity implements
 
             case R.id.nav_tracks:
                 title = getResources().getString(R.string.nav_menu_tracks);
-                fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS);
+                fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS_ALL);
                 tag = MediaListFragment.TAG;
                 break;
 

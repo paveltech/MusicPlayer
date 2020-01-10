@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import androidx.multidex.MultiDex;
 
+import timber.log.Timber;
+
 /**
  * Created by Ashish on 5/15/2017.
  * Main Multidex application
@@ -21,6 +23,9 @@ public class FireApplication extends Application {
         //FireLog.d(TAG, "(++) onCreate");
         super.onCreate();
         appContext = getApplicationContext();
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
     }
 
     @Override
