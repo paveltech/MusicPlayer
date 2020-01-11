@@ -2,24 +2,23 @@ package com.firekernel.musicplayer.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-
-import com.firekernel.musicplayer.api.ApiClient;
-import com.firekernel.musicplayer.api.ApiInterface;
-import com.firekernel.musicplayer.pojo.SongItem;
-import com.firekernel.musicplayer.pojo.SongResponse;
-import com.firekernel.musicplayer.ui.adapter.MediaListAdapter;
-
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firekernel.musicplayer.FirePopupMenuSelectedListener;
 import com.firekernel.musicplayer.R;
+import com.firekernel.musicplayer.api.ApiClient;
+import com.firekernel.musicplayer.api.ApiInterface;
+import com.firekernel.musicplayer.pojo.SongItem;
+import com.firekernel.musicplayer.pojo.SongResponse;
+import com.firekernel.musicplayer.source.MusicProvider;
+import com.firekernel.musicplayer.source.RemoteSource;
+import com.firekernel.musicplayer.ui.adapter.MediaListAdapter;
 import com.firekernel.musicplayer.utils.ActionHelper;
 
 import java.util.ArrayList;
@@ -34,6 +33,8 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListAdapt
     public ApiInterface apiInterface;
     public MediaListAdapter mediaListAdapter;
     public RecyclerView recyclerView;
+    public MusicProvider musicProvider;
+    public RemoteSource remoteSource;
 
 
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
@@ -61,6 +62,8 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListAdapt
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
+        musicProvider = new MusicProvider();
+        remoteSource = new RemoteSource();
         apiCall();
     }
 
@@ -160,6 +163,7 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListAdapt
                 if (response.isSuccessful()) {
                     Timber.d("response " + response.body().getMusic());
                     dataShowIntoList(response.body().getMusic());
+                    createPlayList(response.body().getMusic());
                 }
             }
 
@@ -168,6 +172,12 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListAdapt
 
             }
         });
+    }
+
+    public void createPlayList(ArrayList<SongItem> songItemArrayList) {
+        ArrayList<MediaMetadataCompat> mediaMetadataCompats = remoteSource.makeData(songItemArrayList);
+        musicProvider.setIntoMedia(mediaMetadataCompats);
+
     }
 
     @Override

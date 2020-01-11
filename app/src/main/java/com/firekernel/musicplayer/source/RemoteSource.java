@@ -1,24 +1,10 @@
 package com.firekernel.musicplayer.source;
 
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
 import com.firekernel.musicplayer.pojo.SongItem;
-import com.firekernel.musicplayer.utils.FireLog;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import timber.log.Timber;
 
 /**
  * Utility class to get a list of MusicTrack's based on a server-side JSON
@@ -28,34 +14,18 @@ public class RemoteSource {
 
     protected static final String basePath = "http://storage.googleapis.com/automotive-media/";
 
-    public ArrayList<SongItem> songItemArrayList;
-    public ArrayList<MediaMetadataCompat> mediaMetadataCompatArrayList;
-    public MusicProviderSource musicProviderSource;
 
-
-    public void add(ArrayList<SongItem> songItemArrayList) {
-        this.songItemArrayList = songItemArrayList;
-        Timber.d("song item " + songItemArrayList.size());
-        makeData();
-    }
-
-    public RemoteSource(MusicProviderSource musicProviderSource) {
-        this.musicProviderSource = musicProviderSource;
-        songItemArrayList = new ArrayList<>();
-        mediaMetadataCompatArrayList = new ArrayList<>();
-    }
-
-    public void makeData() {
+    public ArrayList<MediaMetadataCompat> makeData(ArrayList<SongItem> songItemArrayList) {
+        ArrayList<MediaMetadataCompat> mediaMetadataCompatArrayList = new ArrayList<>();
         for (int j = 0; j < songItemArrayList.size(); j++) {
             SongItem songItem = songItemArrayList.get(j);
             mediaMetadataCompatArrayList.add(buildFromJSON(songItem));
         }
-
+        return mediaMetadataCompatArrayList;
     }
 
 
     private MediaMetadataCompat buildFromJSON(SongItem songItem) {
-
         String title = songItem.getTitle();
         String album = songItem.getAlbum();
         String artist = songItem.getArtist();

@@ -28,22 +28,23 @@ public class MusicProvider{
     private  CopyOnWriteArrayList<MediaMetadataCompat> musicList;
     private  CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
 
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private RemoteSource remoteSource;
+
     public Iterator<MediaMetadataCompat> mediaMetadataCompatArrayList;
 
 
-    //private MusicProviderSource remoteSource;
-
-    private MusicProvider() {
+    public MusicProvider() {
         musicList = new CopyOnWriteArrayList<>();
         mediaList = new CopyOnWriteArrayList<>();
+    }
+
+    public Iterator<MediaMetadataCompat> setIntoMedia(ArrayList<MediaMetadataCompat> mediaMetadataCompats){
+        mediaMetadataCompatArrayList = mediaMetadataCompats.iterator();
+        return mediaMetadataCompatArrayList;
     }
 
     public static MusicProvider getInstance() {
         return LazyHolder.INSTANCE;
     }
-
 
     public synchronized boolean retrieveMedia() {
         boolean initialized = false;
@@ -64,7 +65,6 @@ public class MusicProvider{
     }
 
     public List<MediaBrowserCompat.MediaItem> getChildren() {
-
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
         musicList.addAll(mediaList);
         for (MediaMetadataCompat metadata : getAllRetrievedMetadata()) {
@@ -83,10 +83,6 @@ public class MusicProvider{
     }
 
     private MediaBrowserCompat.MediaItem createTracksMediaItem(MediaMetadataCompat metadata) {
-        // Since mediaMetadata fields are immutable, we need to create a copy, so we
-        // can set a hierarchy-aware mediaID. We will need to know the media hierarchy
-        // when we get a onPlayFromMusicID call, so we can create the proper queue based
-        // on where the music was selected from (by artist, by genre, random, etc)
 
         String hierarchyAwareMediaID = MediaIDHelper.createMediaID(metadata.getDescription().getMediaId(), "", MEDIA_ID_TRACKS_ALL);
         Timber.d("hierarch " +hierarchyAwareMediaID);
@@ -98,18 +94,15 @@ public class MusicProvider{
 
     }
 
-    public MediaMetadataCompat getMusic(String musicId) {
+    public MediaMetadataCompat getMusic(String id) {
         for (MediaMetadataCompat metadataCompat : musicList) {
-            if (musicId.equals(metadataCompat.getDescription().getMediaId())) {
+            if (id.equals(metadataCompat.getDescription().getMediaId())) {
                 return metadataCompat;
             }
         }
         return null;
     }
 
-    public interface Callback {
-        void onMusicCatalogReady(boolean success);
-    }
     private static class LazyHolder {
         public static final MusicProvider INSTANCE = new MusicProvider();
     }

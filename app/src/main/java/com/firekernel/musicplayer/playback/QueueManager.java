@@ -90,7 +90,6 @@ public class QueueManager {
     }
 
 
-
     protected void setCurrentQueue(List<MediaSessionCompat.QueueItem> newQueue,
                                    String initialMediaId) {
         playingQueue = newQueue;
