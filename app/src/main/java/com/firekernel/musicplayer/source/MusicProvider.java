@@ -102,6 +102,7 @@ public class MusicProvider {
 
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
         // fill the music List once and keep ever
+
         musicList.addAll(mediaList);
         for (MediaMetadataCompat metadata : getAllRetrievedMetadata()) {
             mediaItems.add(createTracksMediaItem(metadata));

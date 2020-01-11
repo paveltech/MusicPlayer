@@ -70,6 +70,9 @@ public class MediaIDHelper {
         return category == null || (category.indexOf(CATEGORY_SEPARATOR) < 0 && category.indexOf(LEAF_SEPARATOR) < 0);
     }
 
+
+
+
     /**
      * Extracts unique musicID from the mediaID. mediaID is, by this sample's convention, a
      * concatenation of category (eg "by_genre"), categoryValue (eg "Classical") and unique

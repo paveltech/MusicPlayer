@@ -31,7 +31,6 @@
             android:name=".ui.NowPlayingActivity"
             android:label="@string/title_activity_now_playing"
             android:launchMode="singleTop" />
-        <activity android:name=".ui.MediaCategoryActivity" />
 
         <!--MediaBrowserServiceCompat Implementation-->
         <service
