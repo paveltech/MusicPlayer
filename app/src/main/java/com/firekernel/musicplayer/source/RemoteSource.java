@@ -36,11 +36,16 @@ public class RemoteSource implements MusicProviderSource {
     private static final String JSON_TOTAL_TRACK_COUNT = "totalTrackCount";
     private static final String JSON_DURATION = "duration";
 
+
+
+
     @Override
     public Iterator<MediaMetadataCompat> iterator(String mediaId) {
         try {
             int slashPos = CATALOG_URL.lastIndexOf('/');
             String path = CATALOG_URL.substring(0, slashPos + 1);
+
+
             JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
 
 
@@ -63,6 +68,8 @@ public class RemoteSource implements MusicProviderSource {
     }
 
     private MediaMetadataCompat buildFromJSON(JSONObject json, String basePath) throws JSONException {
+
+
         String title = json.getString(JSON_TITLE);
         String album = json.getString(JSON_ALBUM);
         String artist = json.getString(JSON_ARTIST);
