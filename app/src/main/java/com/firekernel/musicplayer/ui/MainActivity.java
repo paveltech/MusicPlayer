@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import com.firekernel.musicplayer.api.ApiClient;
 import com.firekernel.musicplayer.api.ApiInterface;
 import com.firekernel.musicplayer.pojo.SongResponse;
+import com.firekernel.musicplayer.source.MusicProviderSource;
+import com.firekernel.musicplayer.source.RemoteSource;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.fragment.app.Fragment;
@@ -38,12 +40,15 @@ import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.ImageHelper;
 import com.firekernel.musicplayer.utils.MediaIDHelper;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener {
+public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener , MusicProviderSource {
 
     private static final String TAG = FireLog.makeLogTag(MainActivity.class);
 
@@ -56,6 +61,7 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
     private int itemId;
     private String mArtUrl = ""; //do not set null
     public ApiInterface apiInterface;
+    public RemoteSource remoteSource;
 
 
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
@@ -87,6 +93,7 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
 
         apiInterface = ApiClient.getRetrofitInstance().create(ApiInterface.class);
         apiCall();
+        remoteSource = new RemoteSource(this);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -220,7 +227,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
     }
 
 
-
     private MediaListFragment getMediaListFragment() {
         return (MediaListFragment) getSupportFragmentManager().findFragmentByTag(MediaListFragment.TAG);
     }
@@ -335,13 +341,14 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         }
     }
 
-    private void apiCall(){
+    private void apiCall() {
         Call<SongResponse> songResponseCall = apiInterface.getSongs();
         songResponseCall.enqueue(new Callback<SongResponse>() {
             @Override
             public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
-                if (response.isSuccessful()){
-                    Timber.d("response "+response.body().getMusic());
+                if (response.isSuccessful()) {
+                    Timber.d("response " + response.body().getMusic());
+                    remoteSource.add(response.body().getMusic());
                 }
             }
 
@@ -352,5 +359,9 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         });
     }
 
+    @Override
+    public Iterator<MediaMetadataCompat> iterator(ArrayList<MediaMetadataCompat> mediaMetadataCompats) {
+        return null;
+    }
 }
 

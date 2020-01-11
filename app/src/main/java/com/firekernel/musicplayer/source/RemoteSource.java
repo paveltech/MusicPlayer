@@ -18,56 +18,47 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import timber.log.Timber;
+
 /**
  * Utility class to get a list of MusicTrack's based on a server-side JSON
  * configuration.
  */
-public class RemoteSource implements MusicProviderSource {
+public class RemoteSource {
 
     protected static final String CATALOG_URL = "http://storage.googleapis.com/automotive-media/music.json";
+    protected static final String basePath = "http://storage.googleapis.com/automotive-media/";
 
-   /*
-    private static final String TAG = FireLog.makeLogTag(RemoteSource.class);
-    private static final String JSON_MUSIC = "music";
-    private static final String JSON_TITLE = "title";
-    private static final String JSON_ALBUM = "album";
-    private static final String JSON_ARTIST = "artist";
-    private static final String JSON_GENRE = "genre";
-    private static final String JSON_SOURCE = "source";
-    private static final String JSON_IMAGE = "image";
-    private static final String JSON_TRACK_NUMBER = "trackNumber";
-    private static final String JSON_TOTAL_TRACK_COUNT = "totalTrackCount";
-    private static final String JSON_DURATION = "duration";
-    */
 
     public ArrayList<SongItem> songItemArrayList;
     public ArrayList<MediaMetadataCompat> mediaMetadataCompatArrayList;
+    public MusicProviderSource musicProviderSource;
 
 
-    public RemoteSource(ArrayList<SongItem> songItemArrayList) {
+    public void add(ArrayList<SongItem> songItemArrayList) {
         this.songItemArrayList = songItemArrayList;
+        Timber.d("song item " + songItemArrayList.size());
+        makeData();
+    }
+
+    public RemoteSource(MusicProviderSource musicProviderSource) {
+        this.musicProviderSource = musicProviderSource;
+        songItemArrayList = new ArrayList<>();
         mediaMetadataCompatArrayList = new ArrayList<>();
     }
 
-    @Override
-    public Iterator<MediaMetadataCompat> iterator(String mediaId) {
-        try {
-
-
-            for (int j = 0; j < songItemArrayList.size(); j++) {
-                tracks.add(buildFromJSON(jsonTracks.getJSONObject(j), path));
-            }
-
-
-            return tracks.iterator();
-        } catch (JSONException e) {
-            FireLog.e(TAG, "Could not retrieve music list", e);
-            throw new RuntimeException("Could not retrieve music list", e);
+    public void makeData() {
+        for (int j = 0; j < songItemArrayList.size(); j++) {
+            SongItem songItem = songItemArrayList.get(j);
+            mediaMetadataCompatArrayList.add(buildFromJSON(songItem));
         }
+
+        Timber.d("media " + mediaMetadataCompatArrayList.size());
+        musicProviderSource.iterator(mediaMetadataCompatArrayList);
     }
 
-    private MediaMetadataCompat buildFromJSON(SongItem songItem) {
 
+    private MediaMetadataCompat buildFromJSON(SongItem songItem) {
 
         String title = songItem.getTitle();
         String album = songItem.getAlbum();
@@ -80,20 +71,10 @@ public class RemoteSource implements MusicProviderSource {
         int totalTrackCount = songItem.getTotalTrackCount();
         int duration = songItem.getDuration() * 1000; // ms
 
-        FireLog.d(TAG, "Found music track: " + json);
-        Log.d("MUSIC_JSON", "" + json);
 
-        // Media is stored relative to JSON file
-        if (!source.startsWith("http")) {
-            source = basePath + source;
-        }
         if (!iconUrl.startsWith("http")) {
             iconUrl = basePath + iconUrl;
         }
-        // Since we don't have a unique ID in the server, we fake one using the hashcode of
-        // the music source. In a real world app, this could come from the server.
-
-
 
         String id = String.valueOf(source.hashCode());
 
@@ -103,7 +84,6 @@ public class RemoteSource implements MusicProviderSource {
         // sample for convenience only.
 
 
-        //noinspection ResourceType
         return new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
 //                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
@@ -118,39 +98,5 @@ public class RemoteSource implements MusicProviderSource {
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTrackCount)
                 .build();
-    }
-
-    /**
-     * Download a JSON file from a server, parse the content and return the JSON
-     * object.
-     *
-     * @return result JSONObject containing the parsed representation.
-     */
-    private JSONObject fetchJSONFromUrl(String urlString) throws JSONException {
-        BufferedReader reader = null;
-        try {
-            URLConnection urlConnection = new URL(urlString).openConnection();
-            reader = new BufferedReader(new InputStreamReader(
-                    urlConnection.getInputStream(), "iso-8859-1"));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            return new JSONObject(sb.toString());
-        } catch (JSONException e) {
-            throw e;
-        } catch (Exception e) {
-            FireLog.e(TAG, "Failed to parse the json for media list", e);
-            return null;
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
     }
 }

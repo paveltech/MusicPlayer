@@ -83,12 +83,9 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         MediaPlayback playback = new MediaPlayback(this);
 
         playbackManager = new PlaybackManager(this, queueManager, playback);
-
         session.setCallback(playbackManager.getMediaSessionCallback());
-
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
         playbackManager.updatePlaybackState(null);
 
         try {

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
-
-import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.MediaIDHelper;
 
 import java.util.ArrayList;
@@ -25,30 +23,20 @@ import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_TRACKS_ALL
  * MusicProviderSource defined by a constructor argument of this class.
  * MediaId = Category/SubCategory|musicId
  */
-public class MusicProvider {
-    private static final String TAG = FireLog.makeLogTag(MusicProvider.class);
+public class MusicProvider implements MusicProviderSource{
 
-    //only  playable music list, gets updated only when medialist is playable
-    // used by updatemetadata while playing
-
-    private final CopyOnWriteArrayList<MediaMetadataCompat> musicList;
-
-
-    // media list contains browsable + playable media items
-    private final CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
-
+    private  CopyOnWriteArrayList<MediaMetadataCompat> musicList;
+    private  CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
 
     ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private RemoteSource remoteSource;
+    public Iterator<MediaMetadataCompat> mediaMetadataCompatArrayList;
 
-    private MusicProviderSource remoteSource;
+
+    //private MusicProviderSource remoteSource;
 
     private MusicProvider() {
-        // not following the adapter pattern
-        this(new RemoteSource());
-    }
-
-    private MusicProvider(MusicProviderSource remoteSource) {
-        this.remoteSource = remoteSource;
+        remoteSource = new RemoteSource(this);
         musicList = new CopyOnWriteArrayList<>();
         mediaList = new CopyOnWriteArrayList<>();
     }
@@ -62,9 +50,9 @@ public class MusicProvider {
      * for future reference, keying tracks by musicId and grouping by genre.
      */
 
+    @SuppressLint("StaticFieldLeak")
     public void retrieveMediaAsync(final String mediaId, final Callback callback) {
-        FireLog.d(TAG, "(++) retrieveMediaAsync");
-        // Asynchronously load the music catalog in a separate thread
+
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -81,34 +69,33 @@ public class MusicProvider {
     }
 
     private synchronized boolean retrieveMedia(String mediaId) {
+
+
         boolean initialized = false;
         mediaList.clear();
         try {
-            Iterator<MediaMetadataCompat> tracks = remoteSource.iterator(mediaId);
+            Iterator<MediaMetadataCompat> tracks = mediaMetadataCompatArrayList;
+
             while (tracks.hasNext()) {
                 MediaMetadataCompat item = tracks.next();
                 mediaList.add(item);
             }
             initialized = true;
         } catch (Exception e) {
-            FireLog.e(TAG, "Media Initialization failed", e);
+            e.printStackTrace();
         }
         return initialized;
     }
 
     public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
-        FireLog.d(TAG, "(++) getChildren, mediaId=" + mediaId);
-
 
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
-        // fill the music List once and keep ever
-
         musicList.addAll(mediaList);
         for (MediaMetadataCompat metadata : getAllRetrievedMetadata()) {
             mediaItems.add(createTracksMediaItem(metadata));
         }
-
         return mediaItems;
+
     }
 
     public List<MediaMetadataCompat> getAllRetrievedMetadata() {
@@ -125,7 +112,6 @@ public class MusicProvider {
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
         // on where the music was selected from (by artist, by genre, random, etc)
 
-
         String hierarchyAwareMediaID = MediaIDHelper.createMediaID(metadata.getDescription().getMediaId(), "", MEDIA_ID_TRACKS_ALL);
         Timber.d("hierarch " +hierarchyAwareMediaID);
 
@@ -136,7 +122,6 @@ public class MusicProvider {
 
     }
 
-
     public MediaMetadataCompat getMusic(String musicId) {
         for (MediaMetadataCompat metadataCompat : musicList) {
             if (musicId.equals(metadataCompat.getDescription().getMediaId())) {
@@ -146,12 +131,18 @@ public class MusicProvider {
         return null;
     }
 
+    @Override
+    public Iterator<MediaMetadataCompat> iterator(ArrayList<MediaMetadataCompat> mediaMetadataCompats) {
+        this.mediaMetadataCompatArrayList = mediaMetadataCompats.iterator();
+        Timber.d("music provider: "+mediaMetadataCompatArrayList.hasNext());
+        return mediaMetadataCompatArrayList;
+    }
+
     public interface Callback {
         void onMusicCatalogReady(boolean success);
     }
-
-
     private static class LazyHolder {
         public static final MusicProvider INSTANCE = new MusicProvider();
     }
+
 }
