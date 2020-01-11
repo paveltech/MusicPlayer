@@ -44,6 +44,8 @@ public class MediaPlayback implements Playback {
     private static final float VOLUME_DUCK = 0.2f;
     // The volume we set the media player when we have audio focus.
     private static final float VOLUME_NORMAL = 1.0f;
+
+
     private static final String TAG = FireLog.makeLogTag(MediaPlayback.class);
     // we don't have audio focus, and can't duck (play at a low volume)
     private static final int AUDIO_NO_FOCUS_NO_DUCK = 0;
@@ -65,6 +67,10 @@ public class MediaPlayback implements Playback {
     private int currentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
     private SimpleExoPlayer simpleExoPlayer;
 
+    private boolean exoPlayerNullIsStopped = false;
+
+
+
 
     private final BroadcastReceiver audioNoisyReceiver = new BroadcastReceiver() {
         @Override
@@ -80,10 +86,7 @@ public class MediaPlayback implements Playback {
             }
         }
     };
-
-    private boolean exoPlayerNullIsStopped = false;
-    private final AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener =
-            new AudioManager.OnAudioFocusChangeListener() {
+    private final AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
                 @Override
                 public void onAudioFocusChange(int focusChange) {
                     switch (focusChange) {
@@ -112,6 +115,8 @@ public class MediaPlayback implements Playback {
                     }
                 }
             };
+
+
 
     public MediaPlayback(Context context) {
         this.context = context;

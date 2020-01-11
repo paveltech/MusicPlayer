@@ -26,6 +26,8 @@ import java.util.List;
 
 public class MediaListFragment extends Fragment {
     public static final String TAG = FireLog.makeLogTag(MediaListFragment.class);
+
+
     private static final String TITLE = "title";
     private static final String EXTRA_MEDIA_ID = "media_id";
 
@@ -104,8 +106,6 @@ public class MediaListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-
-
 
         getActivity().setTitle(title);
         return view;

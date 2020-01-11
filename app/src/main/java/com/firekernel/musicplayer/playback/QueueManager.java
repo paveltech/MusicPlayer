@@ -44,8 +44,7 @@ public class QueueManager {
         if (current == null) {
             return false;
         }
-        String[] currentBrowseHierarchy = MediaIDHelper.getHierarchy(
-                current.getDescription().getMediaId());
+        String[] currentBrowseHierarchy = MediaIDHelper.getHierarchy(current.getDescription().getMediaId());
 
         return Arrays.equals(newBrowseHierarchy, currentBrowseHierarchy);
     }
@@ -114,9 +113,7 @@ public class QueueManager {
         return playingQueue.get(currentIndex);
     }
 
-    protected void setCurrentQueue(List<MediaSessionCompat.QueueItem> newQueue) {
-        setCurrentQueue(newQueue, null);
-    }
+
 
     protected void setCurrentQueue(List<MediaSessionCompat.QueueItem> newQueue,
                                    String initialMediaId) {
@@ -145,8 +142,6 @@ public class QueueManager {
         }
 
         metadataUpdateListener.onMetadataChanged(metadata);
-
-
     }
 
     public interface MetadataUpdateListener {

@@ -15,8 +15,7 @@ public class QueueHelper {
 
     private static final String TAG = FireLog.makeLogTag(QueueHelper.class);
 
-    public static List<MediaSessionCompat.QueueItem> getPlayingQueue(String mediaId,
-                                                                     MusicProvider musicProvider) {
+    public static List<MediaSessionCompat.QueueItem> getPlayingQueue(String mediaId, MusicProvider musicProvider) {
         FireLog.d(TAG, "(++) getPlayingQueue: mediaId=" + mediaId);
 
         // extract the browsing hierarchy from the media ID:
@@ -41,8 +40,7 @@ public class QueueHelper {
         return convertToQueue(tracks, hierarchy[0], hierarchy[1]);
     }
 
-    private static List<MediaSessionCompat.QueueItem> convertToQueue(
-            Iterable<MediaMetadataCompat> tracks, String... categories) {
+    private static List<MediaSessionCompat.QueueItem> convertToQueue(Iterable<MediaMetadataCompat> tracks, String... categories) {
         FireLog.d(TAG, "(++) convertToQueue: tracks=" + tracks + ", categories=" + categories);
         List<MediaSessionCompat.QueueItem> queue = new ArrayList<>();
         long id = 0;
@@ -59,8 +57,7 @@ public class QueueHelper {
 
             // We don't expect queues to change after created, so we use the item index as the
             // queueId. Any other number unique in the queue would work.
-            MediaSessionCompat.QueueItem item = new MediaSessionCompat.QueueItem(
-                    trackCopy.getDescription(), id++);
+            MediaSessionCompat.QueueItem item = new MediaSessionCompat.QueueItem(trackCopy.getDescription(), id++);
             queue.add(item);
         }
         return queue;

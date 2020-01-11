@@ -52,6 +52,8 @@ public class MediaNotificationManager extends BroadcastReceiver {
 
     private static final int NOTIFICATION_ID = 1 << 2;
     private static final int REQUEST_CODE = 1 << 3;
+
+
     private final MusicPlayerService service;
     private final NotificationManager notificationManager;
 

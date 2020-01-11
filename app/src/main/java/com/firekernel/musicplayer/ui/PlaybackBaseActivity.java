@@ -26,6 +26,8 @@ import com.firekernel.musicplayer.utils.ResourceHelper;
  */
 
 public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserProvider {
+
+
     private static final String TAG = FireLog.makeLogTag(PlaybackBaseActivity.class);
     private MediaBrowserCompat mediaBrowser;
     private PlaybackControlsFragment controlsFragment;
@@ -150,7 +152,6 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
     }
 
     protected void showPlaybackControls() {
-        FireLog.d(TAG, "(++) showPlaybackControls");
         getSupportFragmentManager()
                 .beginTransaction()
                 .show(controlsFragment)

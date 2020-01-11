@@ -26,7 +26,12 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     public static final String ACTION_CMD = "com.firekernel.player.ACTION_CMD";
     public static final String CMD_NAME = "CMD_NAME";
     public static final String CMD_PAUSE = "CMD_PAUSE";
+
+
+
     private static final String TAG = FireLog.makeLogTag(MusicPlayerService.class);
+
+
     // Delay stopSelf by using a handler.
     private static final int STOP_DELAY = 10 * 1000; //10 seconds
     private final DelayedStopHandler delayedStopHandler = new DelayedStopHandler(this);
@@ -76,9 +81,11 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
 
         QueueManager queueManager = new QueueManager(musicProvider, metadataUpdateListener);
         MediaPlayback playback = new MediaPlayback(this);
+
         playbackManager = new PlaybackManager(this, queueManager, playback);
 
         session.setCallback(playbackManager.getMediaSessionCallback());
+
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 

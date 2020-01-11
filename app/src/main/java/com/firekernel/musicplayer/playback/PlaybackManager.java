@@ -23,9 +23,7 @@ public class PlaybackManager implements Playback.Callback {
     private Playback playback;
     private MediaSessionCallback mediaSessionCallback;
 
-    public PlaybackManager(MusicPlayerServiceCallback serviceCallback,
-                           QueueManager queueManager,
-                           Playback playback) {
+    public PlaybackManager(MusicPlayerServiceCallback serviceCallback, QueueManager queueManager, Playback playback) {
         this.serviceCallback = serviceCallback;
         this.queueManager = queueManager;
         this.playback = playback;
@@ -43,6 +41,7 @@ public class PlaybackManager implements Playback.Callback {
 
     public void handlePlayRequest() {
         FireLog.d(TAG, "(++) handlePlayRequest: mState=" + playback.getState());
+
         MediaSessionCompat.QueueItem currentMusic = queueManager.getCurrentMusic();
         if (currentMusic != null) {
             serviceCallback.onPlaybackStart();
@@ -78,8 +77,11 @@ public class PlaybackManager implements Playback.Callback {
      *
      * @param error if not null, error message to present to the user.
      */
+
     public void updatePlaybackState(String error) {
         FireLog.d(TAG, "(++) updatePlaybackState: playback state=" + playback.getState());
+
+
         long position = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN;
         if (playback != null && playback.isConnected()) {
             position = playback.getCurrentStreamPosition();
@@ -121,6 +123,8 @@ public class PlaybackManager implements Playback.Callback {
                 PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH |
                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                 PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
+
+
         FireLog.i(TAG, "actions=" + actions);
         if (playback.isPlaying()) {
             actions |= PlaybackStateCompat.ACTION_PAUSE;

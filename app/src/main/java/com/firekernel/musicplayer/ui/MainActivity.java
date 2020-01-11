@@ -35,10 +35,7 @@ import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.ImageHelper;
 import com.firekernel.musicplayer.utils.MediaIDHelper;
 
-public class MainActivity extends PlaybackBaseActivity implements
-        NavigationView.OnNavigationItemSelectedListener,
-        MediaListFragment.OnMediaItemSelectedListener,
-        FirePopupMenuSelectedListener {
+public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener {
 
     private static final String TAG = FireLog.makeLogTag(MainActivity.class);
 
@@ -163,10 +160,13 @@ public class MainActivity extends PlaybackBaseActivity implements
 
 
         // connect MediaListFragment
+
+
         Fragment fragment = getMediaListFragment();
         if (fragment != null) {
             ((MediaListFragment) fragment).onConnected();
         }
+
 
         Fragment fragmentControl = getControlFragment();
         if (fragmentControl != null) {
@@ -324,20 +324,5 @@ public class MainActivity extends PlaybackBaseActivity implements
         }
     }
 
-    private void unCheckAllMenuItems(NavigationView navigationView) {
-        final Menu menu = navigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-//            if (item.hasSubMenu()) {
-//                SubMenu subMenu = item.getSubMenu();
-//                for (int j = 0; j < subMenu.size(); j++) {
-//                    MenuItem subMenuItem = subMenu.getItem(j);
-//                    subMenuItem.setChecked(false);
-//                }
-//            } else {
-            item.setChecked(false);
-//            }
-        }
-    }
 }
 
