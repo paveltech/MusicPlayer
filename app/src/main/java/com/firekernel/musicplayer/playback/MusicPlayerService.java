@@ -40,9 +40,6 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     private MediaSessionCompat session;
     private MediaNotificationManager mediaNotificationManager;
 
-
-
-
     private QueueManager.MetadataUpdateListener metadataUpdateListener = new QueueManager.MetadataUpdateListener() {
 
         @Override
@@ -141,17 +138,10 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     }
 
     @Override
-    public void onLoadChildren(@NonNull final String parentMediaId, @NonNull final Result<List<MediaItem>> result) {
+    public void onLoadChildren(@NonNull final String id, @NonNull final Result<List<MediaItem>> result) {
         result.detach();
-        musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
-            @Override
-            public void onMusicCatalogReady(boolean success) {
-                result.sendResult(musicProvider.getChildren(parentMediaId));
-            }
-        });
+        result.sendResult(musicProvider.getChildren());
     }
-
-
 
     @Override
     public void onPlaybackStart() {
@@ -160,9 +150,6 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         delayedStopHandler.removeCallbacksAndMessages(null);
         startService(new Intent(getApplicationContext(), MusicPlayerService.class));
     }
-
-
-
     @Override
     public void onNotificationRequired() {
         FireLog.d(TAG, "(++) onNotificationRequired");

@@ -26,9 +26,7 @@ import timber.log.Timber;
  */
 public class RemoteSource {
 
-    protected static final String CATALOG_URL = "http://storage.googleapis.com/automotive-media/music.json";
     protected static final String basePath = "http://storage.googleapis.com/automotive-media/";
-
 
     public ArrayList<SongItem> songItemArrayList;
     public ArrayList<MediaMetadataCompat> mediaMetadataCompatArrayList;
@@ -53,8 +51,6 @@ public class RemoteSource {
             mediaMetadataCompatArrayList.add(buildFromJSON(songItem));
         }
 
-        Timber.d("media " + mediaMetadataCompatArrayList.size());
-        musicProviderSource.iterator(mediaMetadataCompatArrayList);
     }
 
 
@@ -66,27 +62,16 @@ public class RemoteSource {
         String genre = songItem.getGenre();
         //String source = songItem.getSource();
         String source = "https://vod.rockerzs.com/music/numb/master.m3u8";
-        String iconUrl = songItem.getImage();
+        String iconUrl = basePath+ songItem.getImage();
         int trackNumber = songItem.getTrackNumber();
         int totalTrackCount = songItem.getTotalTrackCount();
         int duration = songItem.getDuration() * 1000; // ms
-
-
-        if (!iconUrl.startsWith("http")) {
-            iconUrl = basePath + iconUrl;
-        }
-
-        String id = String.valueOf(source.hashCode());
-
-        // Adding the music source to the MediaMetadata (and consequently using it in the
-        // mediaSession.setMetadata) is not a good idea for a real world music app, because
-        // the session metadata can be accessed by notification listeners. This is done in this
-        // sample for convenience only.
+        String id = ""+songItem.getDuration();
 
 
         return new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
-//                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
+                //.putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
                 //.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)

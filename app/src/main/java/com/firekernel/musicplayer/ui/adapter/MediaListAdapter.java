@@ -2,8 +2,6 @@ package com.firekernel.musicplayer.ui.adapter;
 
 import android.content.Context;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import android.support.v4.media.MediaBrowserCompat;
-import android.support.v4.media.MediaDescriptionCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -16,12 +14,11 @@ import android.widget.TextView;
 
 import com.firekernel.musicplayer.FirePopupMenuSelectedListener;
 import com.firekernel.musicplayer.R;
-import com.firekernel.musicplayer.ui.fragment.MediaListFragment;
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.ImageHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Ashish on 5/15/2017.
@@ -31,13 +28,16 @@ import java.util.List;
 public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyViewHolder> {
     private static final String TAG = FireLog.makeLogTag(MediaListAdapter.class);
     private Context context;
-    private List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
+    public ArrayList<SongItem> songItemArrayList;
     private FirePopupMenuSelectedListener popupMenuSelectedListener;
-    private MediaListFragment.OnMediaItemSelectedListener onMediaItemSelectedListener;
+    private OnMediaItemSelectedListener onMediaItemSelectedListener;
 
-    public MediaListAdapter(Context context, List<MediaBrowserCompat.MediaItem> mediaItems) {
+    public MediaListAdapter(Context context, ArrayList<SongItem> songItemArrayList , OnMediaItemSelectedListener onMediaItemSelectedListener ) {
         this.context = context;
-        this.mediaItems = mediaItems;
+        this.onMediaItemSelectedListener = onMediaItemSelectedListener;
+        this.songItemArrayList = songItemArrayList;
+
+        /*
         if (context instanceof MediaListFragment.OnMediaItemSelectedListener) {
             onMediaItemSelectedListener = (MediaListFragment.OnMediaItemSelectedListener) context;
         } else {
@@ -50,11 +50,13 @@ public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyVi
             throw new RuntimeException(context.toString()
                     + " must implement FirePopupMenuSelectedListener");
         }
+
+         */
     }
 
     @Override
     public int getItemCount() {
-        return mediaItems.size();
+        return songItemArrayList.size();
     }
 
     @Override
@@ -66,31 +68,30 @@ public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        MediaBrowserCompat.MediaItem mediaItem = mediaItems.get(position);
-        MediaDescriptionCompat description = mediaItem.getDescription();
-        holder.title.setText(description.getTitle());
-        holder.detail.setText(description.getSubtitle());
-        ImageHelper.loadArt(context, holder.albumArt, description);
-        setItemClickListener(holder, mediaItem);
-        setOnPopupMenuListener(holder, mediaItem);
+        SongItem songItem  = songItemArrayList.get(position);
+
+        holder.title.setText(songItem.getTitle());
+        ImageHelper.loadArt(context, holder.albumArt, songItem.getImage());
+        setItemClickListener(holder, songItem);
+        setOnPopupMenuListener(holder, songItem);
     }
 
-    public void refreshData(List<MediaBrowserCompat.MediaItem> data) {
-        mediaItems.clear();
-        mediaItems.addAll(data);
+    public void refreshData(ArrayList<SongItem> data) {
+        songItemArrayList.clear();
+        songItemArrayList.addAll(data);
         notifyDataSetChanged();
     }
 
-    private void setItemClickListener(MyViewHolder myViewHolder, final MediaBrowserCompat.MediaItem mediaItem) {
+    private void setItemClickListener(MyViewHolder myViewHolder,SongItem songItem) {
         myViewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onMediaItemSelectedListener.onMediaItemSelected(mediaItem);
+                onMediaItemSelectedListener.onMediaItemSelected(songItem);
             }
         });
     }
 
-    private void setOnPopupMenuListener(MyViewHolder myViewHolder, final MediaBrowserCompat.MediaItem mediaItem) {
+    private void setOnPopupMenuListener(MyViewHolder myViewHolder, SongItem mediaItem) {
         myViewHolder.popupMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,4 +135,9 @@ public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyVi
             popupMenuBtn = (ImageButton) view.findViewById(R.id.popupMenuBtn);
         }
     }
+
+    public interface OnMediaItemSelectedListener {
+        void onMediaItemSelected(SongItem item);
+    }
+
 }

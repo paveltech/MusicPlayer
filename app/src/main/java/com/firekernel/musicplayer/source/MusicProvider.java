@@ -23,7 +23,7 @@ import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_TRACKS_ALL
  * MusicProviderSource defined by a constructor argument of this class.
  * MediaId = Category/SubCategory|musicId
  */
-public class MusicProvider implements MusicProviderSource{
+public class MusicProvider{
 
     private  CopyOnWriteArrayList<MediaMetadataCompat> musicList;
     private  CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
@@ -36,7 +36,6 @@ public class MusicProvider implements MusicProviderSource{
     //private MusicProviderSource remoteSource;
 
     private MusicProvider() {
-        remoteSource = new RemoteSource(this);
         musicList = new CopyOnWriteArrayList<>();
         mediaList = new CopyOnWriteArrayList<>();
     }
@@ -45,32 +44,8 @@ public class MusicProvider implements MusicProviderSource{
         return LazyHolder.INSTANCE;
     }
 
-    /**
-     * Get the list of music tracks from a server and caches the track information
-     * for future reference, keying tracks by musicId and grouping by genre.
-     */
 
-    @SuppressLint("StaticFieldLeak")
-    public void retrieveMediaAsync(final String mediaId, final Callback callback) {
-
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                return retrieveMedia(mediaId);
-            }
-
-            @Override
-            protected void onPostExecute(Boolean initialized) {
-                if (callback != null) {
-                    callback.onMusicCatalogReady(initialized);
-                }
-            }
-        }.executeOnExecutor(executorService);
-    }
-
-    private synchronized boolean retrieveMedia(String mediaId) {
-
-
+    public synchronized boolean retrieveMedia() {
         boolean initialized = false;
         mediaList.clear();
         try {
@@ -84,10 +59,11 @@ public class MusicProvider implements MusicProviderSource{
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return initialized;
     }
 
-    public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
+    public List<MediaBrowserCompat.MediaItem> getChildren() {
 
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
         musicList.addAll(mediaList);
@@ -129,13 +105,6 @@ public class MusicProvider implements MusicProviderSource{
             }
         }
         return null;
-    }
-
-    @Override
-    public Iterator<MediaMetadataCompat> iterator(ArrayList<MediaMetadataCompat> mediaMetadataCompats) {
-        this.mediaMetadataCompatArrayList = mediaMetadataCompats.iterator();
-        Timber.d("music provider: "+mediaMetadataCompatArrayList.hasNext());
-        return mediaMetadataCompatArrayList;
     }
 
     public interface Callback {

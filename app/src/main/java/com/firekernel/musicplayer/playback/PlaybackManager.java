@@ -164,7 +164,7 @@ public class PlaybackManager implements Playback.Callback {
     @Override
     public void setCurrentMediaId(String mediaId) {
         FireLog.d(TAG, "setCurrentMediaId" + mediaId);
-        queueManager.setQueueFromMusic(mediaId);
+        //queueManager.setQueueFromMusic(mediaId);
     }
 
     public interface MusicPlayerServiceCallback {
@@ -204,7 +204,7 @@ public class PlaybackManager implements Playback.Callback {
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
             FireLog.d(TAG, "(++) onPlayFromMediaId mediaId:" + mediaId + "  extras=" + extras);
-            queueManager.setQueueFromMusic(mediaId);
+            //queueManager.setQueueFromMusic(mediaId);
             handlePlayRequest();
         }
 

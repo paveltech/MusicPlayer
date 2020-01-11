@@ -7,8 +7,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main">
 
-    <FrameLayout
-        android:id="@+id/flContent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="4dp"
@@ -26,7 +26,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/flContent"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view"
         tools:layout="@layout/fragment_playback_controls" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,7 +14,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.firekernel.musicplayer.R;
-import com.firekernel.musicplayer.playback.MediaBrowserProvider;
 import com.firekernel.musicplayer.playback.MusicPlayerService;
 import com.firekernel.musicplayer.ui.fragment.PlaybackControlsFragment;
 import com.firekernel.musicplayer.utils.FireLog;
@@ -25,13 +24,14 @@ import com.firekernel.musicplayer.utils.ResourceHelper;
  * Connects with MediaBrowser + capability to show hide MediaControlFragment
  */
 
-public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserProvider {
-
+public class PlaybackBaseActivity extends BaseActivity {
 
     private static final String TAG = FireLog.makeLogTag(PlaybackBaseActivity.class);
     private MediaBrowserCompat mediaBrowser;
     private PlaybackControlsFragment controlsFragment;
     // Callback that ensures that we are showing the controls
+
+
     private final MediaControllerCompat.Callback mediaControllerCallback =
             new MediaControllerCompat.Callback() {
                 @Override
@@ -92,7 +92,7 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
 
         // Connect a media browser just to get the media session token. There are other ways
         // this can be done, for example by sharing the session token directly.
-        mediaBrowser = new MediaBrowserCompat(this,
+         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicPlayerService.class),
                 mediaBrowserConnectionCallback,
                 null);
@@ -112,8 +112,6 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
         }
 
         hidePlaybackControls();
-
-//      mediaBrowser.connect();
 
         try {
             connectToSession(mediaBrowser.getSessionToken());
@@ -142,11 +140,6 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
             mediaBrowser.disconnect();
     }
 
-    @Override
-    public MediaBrowserCompat getMediaBrowser() {
-        return mediaBrowser;
-    }
-
     protected void onMediaControllerConnected() {
         // empty implementation, can be overridden by clients.
     }
@@ -159,10 +152,6 @@ public class PlaybackBaseActivity extends BaseActivity implements MediaBrowserPr
     }
 
     protected void hidePlaybackControls() {
-        FireLog.d(TAG, "(++) hidePlaybackControls");
-        if (isFinishing() || isDestroyed()) {
-            return;
-        }
         getSupportFragmentManager()
                 .beginTransaction()
                 .hide(controlsFragment)
