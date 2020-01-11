@@ -17,6 +17,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import timber.log.Timber;
+
 /**
  * Utility class to get a list of MusicTrack's based on a server-side JSON
  * configuration.
@@ -41,6 +43,8 @@ public class RemoteSource implements MusicProviderSource {
         try {
             int slashPos = CATALOG_URL.lastIndexOf('/');
             String path = CATALOG_URL.substring(0, slashPos + 1);
+
+            Timber.d("path: "+path);
             JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
 
 
