@@ -42,9 +42,6 @@ public class MusicProvider{
         return mediaMetadataCompatArrayList;
     }
 
-    public static MusicProvider getInstance() {
-        return LazyHolder.INSTANCE;
-    }
 
     public synchronized boolean retrieveMedia() {
         boolean initialized = false;
@@ -103,8 +100,5 @@ public class MusicProvider{
         return null;
     }
 
-    private static class LazyHolder {
-        public static final MusicProvider INSTANCE = new MusicProvider();
-    }
 
 }

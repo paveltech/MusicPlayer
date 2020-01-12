@@ -77,8 +77,7 @@ public class QueueHelper {
         return -1;
     }
 
-    public static int getMusicIndexOnQueue(Iterable<MediaSessionCompat.QueueItem> queue,
-                                           long queueId) {
+    public static int getMusicIndexOnQueue(Iterable<MediaSessionCompat.QueueItem> queue, long queueId) {
         FireLog.d(TAG, "(++) getMusicIndexOnQueue: queueId=" + queueId);
         int index = 0;
         for (MediaSessionCompat.QueueItem item : queue) {
@@ -89,7 +88,6 @@ public class QueueHelper {
         }
         return -1;
     }
-
 
     public static boolean isIndexPlayable(int index, List<MediaSessionCompat.QueueItem> queue) {
         return (queue != null && index >= 0 && index < queue.size());

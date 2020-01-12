@@ -38,6 +38,16 @@ public class QueueManager {
         currentIndex = 0;
     }
 
+    public boolean isSameBrowsingCategory(@NonNull String mediaId) {
+        String[] newBrowseHierarchy = MediaIDHelper.getHierarchy(mediaId);
+        MediaSessionCompat.QueueItem current = getCurrentMusic();
+        if (current == null) {
+            return false;
+        }
+        String[] currentBrowseHierarchy = MediaIDHelper.getHierarchy(current.getDescription().getMediaId());
+
+        return Arrays.equals(newBrowseHierarchy, currentBrowseHierarchy);
+    }
 
     private void setCurrentQueueIndex(int index) {
         if (index >= 0 && index < playingQueue.size()) {
@@ -78,7 +88,15 @@ public class QueueManager {
         return true;
     }
 
-    public void setQueueFromMusic() {
+    public void setQueueFromMusic(String mediaId) {
+        FireLog.d(TAG, "(++) setQueueFromMusic: mediaId=" + mediaId);
+        boolean canReuseQueue = false;
+        if (isSameBrowsingCategory(mediaId)) {
+            canReuseQueue = setCurrentQueueItem(mediaId);
+        }
+        if (!canReuseQueue) {
+            setCurrentQueue(QueueHelper.getPlayingQueue(mediaId, musicProvider), mediaId);
+        }
         updateMetadata();
     }
 
@@ -88,6 +106,7 @@ public class QueueManager {
         }
         return playingQueue.get(currentIndex);
     }
+
 
 
     protected void setCurrentQueue(List<MediaSessionCompat.QueueItem> newQueue,

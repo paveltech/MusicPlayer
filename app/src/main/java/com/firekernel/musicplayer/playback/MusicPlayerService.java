@@ -74,7 +74,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         session = new MediaSessionCompat(this, MusicPlayerService.class.getSimpleName());
         setSessionToken(session.getSessionToken());
 
-        musicProvider = MusicProvider.getInstance();
+        musicProvider = new MusicProvider();
 
         QueueManager queueManager = new QueueManager(musicProvider, metadataUpdateListener);
         MediaPlayback playback = new MediaPlayback(this);
@@ -140,6 +140,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     @Override
     public void onLoadChildren(@NonNull final String id, @NonNull final Result<List<MediaItem>> result) {
         result.detach();
+        musicProvider.retrieveMedia();
         result.sendResult(musicProvider.getChildren());
     }
 

@@ -192,7 +192,9 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListAdapt
 
     @Override
     public void onMediaItemSelected(SongItem item) {
+        Timber.d("click done");
 
+        MediaControllerCompat.getMediaController(this).getTransportControls().playFromMediaId("" + item.getDuration(), null);
     }
 
 }
