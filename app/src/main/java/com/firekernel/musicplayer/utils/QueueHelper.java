@@ -19,23 +19,6 @@ public class QueueHelper {
 
     public static List<MediaSessionCompat.QueueItem> getPlayingQueue(String mediaId, MusicProvider musicProvider) {
         FireLog.d(TAG, "(++) getPlayingQueue: mediaId=" + mediaId);
-
-        // extract the browsing hierarchy from the media ID:
-        String[] hierarchy = MediaIDHelper.getHierarchy(mediaId);
-
-        Timber.d("hierarchy" +hierarchy.length);
-
-        /*
-        if (hierarchy.length != 2) {
-            FireLog.e(TAG, "Could not build a playing queue for this mediaId: " + mediaId);
-            return null;
-        }
-
-         */
-
-        //String categoryType = hierarchy[0];
-        //String categoryValue = hierarchy[1];
-
         List<MediaMetadataCompat> tracks = musicProvider.getAllRetrievedMetadata();
 
         return convertToQueue(tracks);

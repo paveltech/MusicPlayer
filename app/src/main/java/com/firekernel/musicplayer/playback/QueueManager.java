@@ -48,7 +48,6 @@ public class QueueManager {
             return false;
         }
         String[] currentBrowseHierarchy = MediaIDHelper.getHierarchy(current.getDescription().getMediaId());
-
         return Arrays.equals(newBrowseHierarchy, currentBrowseHierarchy);
     }
 
