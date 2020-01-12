@@ -125,8 +125,7 @@ public class MusicProvider {
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
         // on where the music was selected from (by artist, by genre, random, etc)
 
-
-        String hierarchyAwareMediaID = MediaIDHelper.createMediaID(metadata.getDescription().getMediaId(), "", MEDIA_ID_TRACKS_ALL);
+        String hierarchyAwareMediaID = metadata.getDescription().getMediaId();
         Timber.d("hierarch " +hierarchyAwareMediaID);
 
         MediaMetadataCompat copy = new MediaMetadataCompat.Builder(metadata).putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID).build();

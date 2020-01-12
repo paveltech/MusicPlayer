@@ -89,7 +89,7 @@ public class RemoteSource implements MusicProviderSource {
         }
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.
-        String id = String.valueOf(source.hashCode());
+        String id = ""+duration;
 
         // Adding the music source to the MediaMetadata (and consequently using it in the
         // mediaSession.setMetadata) is not a good idea for a real world music app, because

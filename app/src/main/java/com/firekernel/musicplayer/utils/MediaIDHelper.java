@@ -24,7 +24,7 @@ public class MediaIDHelper {
 
      */
 
-    private static final char CATEGORY_SEPARATOR = ',';
+    private static final char CATEGORY_SEPARATOR = ' ';
     private static final char LEAF_SEPARATOR = '|';
 
     /**
@@ -42,6 +42,8 @@ public class MediaIDHelper {
      * @param categories hierarchy of categories representing this item's browsing parents
      * @return a hierarchy-aware media ID
      */
+
+    /*
     public static String createMediaID(String musicID, String... categories) {
         StringBuilder sb = new StringBuilder();
         if (categories != null) {
@@ -62,6 +64,8 @@ public class MediaIDHelper {
         Timber.d("media id: "+sb.toString());
         return sb.toString();
     }
+
+     */
 
     /**
      * A Category is valid only when there is no category separator and no leaf separator
@@ -101,10 +105,7 @@ public class MediaIDHelper {
     public static
     @NonNull
     String[] getHierarchy(@NonNull String mediaID) {
-        int pos = mediaID.indexOf(LEAF_SEPARATOR);
-        if (pos >= 0) {
-            mediaID = mediaID.substring(0, pos);
-        }
+        Timber.d("id: "+mediaID.split(String.valueOf(CATEGORY_SEPARATOR)));
         return mediaID.split(String.valueOf(CATEGORY_SEPARATOR));
     }
 

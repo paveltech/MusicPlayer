@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Simple data provider for queues. Keeps track of a current queue and a current index in the
  * queue. Also provides methods to set the current queue based on common queries, relying on a
@@ -40,6 +42,7 @@ public class QueueManager {
 
     public boolean isSameBrowsingCategory(@NonNull String mediaId) {
         String[] newBrowseHierarchy = MediaIDHelper.getHierarchy(mediaId);
+        Timber.d("newBrowseHierarchy" +newBrowseHierarchy.toString());
         MediaSessionCompat.QueueItem current = getCurrentMusic();
         if (current == null) {
             return false;
@@ -115,8 +118,7 @@ public class QueueManager {
 
 
 
-    protected void setCurrentQueue(List<MediaSessionCompat.QueueItem> newQueue,
-                                   String initialMediaId) {
+    protected void setCurrentQueue(List<MediaSessionCompat.QueueItem> newQueue, String initialMediaId) {
         playingQueue = newQueue;
         int index = 0;
         if (initialMediaId != null) {
@@ -133,7 +135,7 @@ public class QueueManager {
             metadataUpdateListener.onMetadataRetrieveError();
             return;
         }
-        final String musicId = MediaIDHelper.extractMusicIDFromMediaID(currentMusic.getDescription().getMediaId());
+        final String musicId = currentMusic.getDescription().getMediaId();
 
 
         MediaMetadataCompat metadata = musicProvider.getMusic(musicId);

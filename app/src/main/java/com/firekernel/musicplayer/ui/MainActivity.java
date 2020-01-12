@@ -189,7 +189,7 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         FireLog.d(TAG, "(++) onMediaItemSelected, mediaitem=" + item);
         if (item.isPlayable()) {
             MediaControllerCompat.getMediaController(this).getTransportControls()
-                    .playFromMediaId(item.getMediaId(), null);
+                    .playFromMediaId("103000", null);
         }
     }
 

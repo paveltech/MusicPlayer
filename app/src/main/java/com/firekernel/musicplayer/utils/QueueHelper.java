@@ -8,6 +8,8 @@ import com.firekernel.musicplayer.source.MusicProvider;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Utility class to help on queue related tasks.
  */
@@ -21,42 +23,33 @@ public class QueueHelper {
         // extract the browsing hierarchy from the media ID:
         String[] hierarchy = MediaIDHelper.getHierarchy(mediaId);
 
+        Timber.d("hierarchy" +hierarchy.length);
+
+        /*
         if (hierarchy.length != 2) {
             FireLog.e(TAG, "Could not build a playing queue for this mediaId: " + mediaId);
             return null;
         }
 
-        String categoryType = hierarchy[0];
-        String categoryValue = hierarchy[1];
-        FireLog.d(TAG, "Creating playing queue for " + categoryType + ",  " + categoryValue);
+         */
+
+        //String categoryType = hierarchy[0];
+        //String categoryValue = hierarchy[1];
 
         List<MediaMetadataCompat> tracks = musicProvider.getAllRetrievedMetadata();
 
-        if (tracks == null) {
-            FireLog.e(TAG, "Unrecognized category type: " + categoryType + " for media " + mediaId);
-            return null;
-        }
-
-        return convertToQueue(tracks, hierarchy[0], hierarchy[1]);
+        return convertToQueue(tracks);
     }
 
-    private static List<MediaSessionCompat.QueueItem> convertToQueue(Iterable<MediaMetadataCompat> tracks, String... categories) {
-        FireLog.d(TAG, "(++) convertToQueue: tracks=" + tracks + ", categories=" + categories);
+    private static List<MediaSessionCompat.QueueItem> convertToQueue(Iterable<MediaMetadataCompat> tracks) {
+        FireLog.d(TAG, "(++) convertToQueue: tracks=" + tracks);
         List<MediaSessionCompat.QueueItem> queue = new ArrayList<>();
         long id = 0;
         for (MediaMetadataCompat track : tracks) {
-
-            // We create a hierarchy-aware mediaID, so we know what the queue is about by looking
-            // at the QueueItem media IDs.
-            String hierarchyAwareMediaID = MediaIDHelper.createMediaID(track.getDescription().getMediaId(), categories);
-
-
+            String hierarchyAwareMediaID = track.getDescription().getMediaId();
             MediaMetadataCompat trackCopy = new MediaMetadataCompat.Builder(track)
                     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID)
                     .build();
-
-            // We don't expect queues to change after created, so we use the item index as the
-            // queueId. Any other number unique in the queue would work.
             MediaSessionCompat.QueueItem item = new MediaSessionCompat.QueueItem(trackCopy.getDescription(), id++);
             queue.add(item);
         }
@@ -64,11 +57,16 @@ public class QueueHelper {
 
     }
 
-    public static int getMusicIndexOnQueue(Iterable<MediaSessionCompat.QueueItem> queue,
-                                           String mediaId) {
+    public static int getMusicIndexOnQueue(Iterable<MediaSessionCompat.QueueItem> queue, String mediaId) {
         FireLog.d(TAG, "(++) getMusicIndexOnQueue: mediaId=" + mediaId);
         int index = 0;
+
+        if (queue==null){
+            FireLog.d(TAG, "++ Queue is null" + mediaId);
+        }
+
         for (MediaSessionCompat.QueueItem item : queue) {
+            FireLog.d(TAG, "(++) queue : mediaId=" + item.getDescription().getMediaId());
             if (mediaId.equals(item.getDescription().getMediaId())) {
                 return index;
             }
@@ -89,7 +87,6 @@ public class QueueHelper {
         }
         return -1;
     }
-
 
     public static boolean isIndexPlayable(int index, List<MediaSessionCompat.QueueItem> queue) {
         return (queue != null && index >= 0 && index < queue.size());
