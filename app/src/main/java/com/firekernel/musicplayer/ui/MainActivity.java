@@ -43,7 +43,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener {
+public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener {
 
     private static final String TAG = FireLog.makeLogTag(MainActivity.class);
 
@@ -202,22 +202,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
                     .playFromMediaId("103000", null);
         }
     }
-
-    @Override
-    public void onPlaySelected(MediaBrowserCompat.MediaItem item) {
-        FireLog.d(TAG, "(++) onPlaySelected");
-        if (item.isPlayable()) {
-            MediaControllerCompat.getMediaController(this).getTransportControls()
-                    .playFromMediaId(item.getMediaId(), null);
-        }
-    }
-
-    @Override
-    public void onShareSelected(MediaBrowserCompat.MediaItem item) {
-        ActionHelper.shareTrack(this, item.getDescription());
-//        ActionHelper.shareTrack(this, item.getDescription().getMediaId());
-    }
-
 
 
     private MediaListFragment getMediaListFragment() {
