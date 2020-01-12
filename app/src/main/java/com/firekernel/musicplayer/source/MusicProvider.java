@@ -1,12 +1,10 @@
 package com.firekernel.musicplayer.source;
 
-import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 
 import com.firekernel.musicplayer.utils.FireLog;
-import com.firekernel.musicplayer.utils.MediaIDHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,8 +15,6 @@ import java.util.concurrent.Executors;
 
 import timber.log.Timber;
 
-import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_TRACKS_ALL;
-
 
 /**
  * Simple data provider for music tracks. The actual metadata localSource is delegated to a
@@ -28,19 +24,12 @@ import static com.firekernel.musicplayer.utils.MediaIDHelper.MEDIA_ID_TRACKS_ALL
 public class MusicProvider {
     private static final String TAG = FireLog.makeLogTag(MusicProvider.class);
 
-    //only  playable music list, gets updated only when medialist is playable
-    // used by updatemetadata while playing
-
     private final CopyOnWriteArrayList<MediaMetadataCompat> musicList;
-
-
-    // media list contains browsable + playable media items
     private final CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
 
-
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     private MusicProviderSource remoteSource;
+
 
     private MusicProvider() {
         // not following the adapter pattern
