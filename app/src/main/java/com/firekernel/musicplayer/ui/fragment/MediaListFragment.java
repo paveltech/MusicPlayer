@@ -25,10 +25,8 @@ import com.firekernel.musicplayer.api.ApiInterface;
 import com.firekernel.musicplayer.playback.MediaBrowserProvider;
 import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.pojo.SongResponse;
-import com.firekernel.musicplayer.source.MusicProvider;
 import com.firekernel.musicplayer.ui.adapter.MediaListAdapter;
 import com.firekernel.musicplayer.utils.FireLog;
-import com.firekernel.musicplayer.utils.TinyDB;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -119,7 +117,7 @@ public class MediaListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-        TinyDB tinydb = new TinyDB(getActivity());
+
 
         apiInterface.getSongs().enqueue(new Callback<SongResponse>() {
             @Override

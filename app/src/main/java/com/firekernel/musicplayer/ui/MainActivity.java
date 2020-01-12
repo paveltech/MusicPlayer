@@ -66,7 +66,7 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListFragm
             // Set the default view when activity is launched on the first time
             openFragment();
             // Only check if a Now Playing is needed on the first time
-            ActionHelper.startNowPlayingActivityIfNeeded(this, getIntent());
+            //ActionHelper.startNowPlayingActivityIfNeeded(this, getIntent());
         }
     }
 
@@ -84,7 +84,7 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListFragm
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         FireLog.d(TAG, "(++) onNewIntent, intent=" + intent);
-        ActionHelper.startNowPlayingActivityIfNeeded(this, intent);
+        //ActionHelper.startNowPlayingActivityIfNeeded(this, intent);
     }
 
     @Override
@@ -134,9 +134,8 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListFragm
     @Override
     public void onMediaItemSelected(SongItem item) {
         FireLog.d(TAG, "(++) onMediaItemSelected, mediaitem=" + item);
-
         MediaControllerCompat.getMediaController(this).getTransportControls()
-                    .playFromMediaId("103000", null);
+                    .playFromMediaId(""+(item.getDuration()*1000), null);
 
     }
 

@@ -1,14 +1,7 @@
 package com.firekernel.musicplayer.source;
 
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
-
 import com.firekernel.musicplayer.pojo.SongItem;
-import com.firekernel.musicplayer.utils.FireLog;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class ApiSource {
@@ -27,7 +20,6 @@ public class ApiSource {
         return mediaMetadataCompatArrayList;
     }
 
-
     private MediaMetadataCompat buildFromJSON(SongItem songItem){
         String title = songItem.getTitle();
         String album = songItem.getAlbum();
@@ -41,6 +33,8 @@ public class ApiSource {
 
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.
+
+
         String id = ""+duration;
         return new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
