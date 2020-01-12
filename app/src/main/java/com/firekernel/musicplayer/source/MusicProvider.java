@@ -1,5 +1,6 @@
 package com.firekernel.musicplayer.source;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -51,6 +52,7 @@ public class MusicProvider {
      * for future reference, keying tracks by musicId and grouping by genre.
      */
 
+    @SuppressLint("StaticFieldLeak")
     public void retrieveMediaAsync(final String mediaId, final Callback callback) {
         FireLog.d(TAG, "(++) retrieveMediaAsync");
         // Asynchronously load the music catalog in a separate thread

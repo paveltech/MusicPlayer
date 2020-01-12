@@ -1,19 +1,16 @@
 package com.firekernel.musicplayer.source;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
+import com.firekernel.musicplayer.FireApplication;
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.utils.FireLog;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -23,8 +20,11 @@ import timber.log.Timber;
  * Utility class to get a list of MusicTrack's based on a server-side JSON
  * configuration.
  */
+
+
 public class RemoteSource implements MusicProviderSource {
 
+    protected static final String basePath = "http://storage.googleapis.com/automotive-media/";
     protected static final String CATALOG_URL = "http://storage.googleapis.com/automotive-media/music.json";
     private static final String TAG = FireLog.makeLogTag(RemoteSource.class);
     private static final String JSON_MUSIC = "music";
@@ -38,35 +38,70 @@ public class RemoteSource implements MusicProviderSource {
     private static final String JSON_TOTAL_TRACK_COUNT = "totalTrackCount";
     private static final String JSON_DURATION = "duration";
 
-    @Override
-    public Iterator<MediaMetadataCompat> iterator(String mediaId) {
-        try {
-            int slashPos = CATALOG_URL.lastIndexOf('/');
-            String path = CATALOG_URL.substring(0, slashPos + 1);
 
-            Timber.d("path: "+path);
-            JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
-
-
-            ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
-
-            if (jsonObj != null) {
-                JSONArray jsonTracks = jsonObj.getJSONArray(JSON_MUSIC);
-
-                if (jsonTracks != null) {
-                    for (int j = 0; j < jsonTracks.length(); j++) {
-                        tracks.add(buildFromJSON(jsonTracks.getJSONObject(j), path));
-                    }
-                }
-            }
-            return tracks.iterator();
-        } catch (JSONException e) {
-            FireLog.e(TAG, "Could not retrieve music list", e);
-            throw new RuntimeException("Could not retrieve music list", e);
-        }
+    public ArrayList<SongItem> getArrayList(String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(FireApplication.getInstance().getApplicationContext());
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<SongItem>>() {
+        }.getType();
+        return gson.fromJson(json, type);
     }
 
+    @Override
+    public Iterator<MediaMetadataCompat> iterator(String mediaId) {
+
+
+        ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
+        ArrayList<SongItem> songItemArrayList = getArrayList("music");
+
+        Timber.d("list size "+songItemArrayList.size());
+        for (int j = 0; j < songItemArrayList.size(); j++) {
+            SongItem songItem = songItemArrayList.get(j);
+            tracks.add(buildFromJSON(songItem));
+            }
+
+        return tracks.iterator();
+
+    }
+
+
+    private MediaMetadataCompat buildFromJSON(SongItem songItem) {
+        String title = songItem.getTitle();
+        String album = songItem.getAlbum();
+        String artist = songItem.getArtist();
+        String genre = songItem.getGenre();
+        String source = "https://vod.rockerzs.com/music/numb/master.m3u8";
+        String iconUrl = basePath + songItem.getImage();
+        int trackNumber = songItem.getTrackNumber();
+        int totalTrackCount = songItem.getTotalTrackCount();
+        int duration = songItem.getDuration() * 1000; // ms
+
+        // Since we don't have a unique ID in the server, we fake one using the hashcode of
+        // the music source. In a real world app, this could come from the server.
+        String id = "" + duration;
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
+//                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
+                //.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, "https://vod.rockerzs.com/music/numb/master.m3u8")
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, iconUrl)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTrackCount)
+                .build();
+    }
+
+
+
+
+    /*
     private MediaMetadataCompat buildFromJSON(JSONObject json, String basePath) throws JSONException {
+
         String title = json.getString(JSON_TITLE);
         String album = json.getString(JSON_ALBUM);
         String artist = json.getString(JSON_ARTIST);
@@ -120,6 +155,9 @@ public class RemoteSource implements MusicProviderSource {
      *
      * @return result JSONObject containing the parsed representation.
      */
+
+
+    /*
     private JSONObject fetchJSONFromUrl(String urlString) throws JSONException {
         BufferedReader reader = null;
         try {
@@ -147,4 +185,6 @@ public class RemoteSource implements MusicProviderSource {
             }
         }
     }
+
+     */
 }

@@ -1,10 +1,13 @@
 package com.firekernel.musicplayer.ui.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import android.preference.PreferenceManager;
 import android.support.v4.media.MediaBrowserCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,8 +25,11 @@ import com.firekernel.musicplayer.api.ApiInterface;
 import com.firekernel.musicplayer.playback.MediaBrowserProvider;
 import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.pojo.SongResponse;
+import com.firekernel.musicplayer.source.MusicProvider;
 import com.firekernel.musicplayer.ui.adapter.MediaListAdapter;
 import com.firekernel.musicplayer.utils.FireLog;
+import com.firekernel.musicplayer.utils.TinyDB;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,12 +119,14 @@ public class MediaListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+        TinyDB tinydb = new TinyDB(getActivity());
 
         apiInterface.getSongs().enqueue(new Callback<SongResponse>() {
             @Override
             public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
                 if (response.isSuccessful()){
-                    adapter.refreshData(response.body().getMusic());
+                    loadView(response.body().getMusic());
+                    saveArrayList(response.body().getMusic() , "music");
                 }
             }
 
@@ -131,6 +139,16 @@ public class MediaListFragment extends Fragment {
         getActivity().setTitle(title);
         return view;
     }
+
+    public void saveArrayList(ArrayList<SongItem> list, String key){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();     // This line is IMPORTANT !!!
+    }
+
 
     @Override
     public void onStart() {

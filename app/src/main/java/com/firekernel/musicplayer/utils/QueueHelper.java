@@ -19,8 +19,8 @@ public class QueueHelper {
 
     public static List<MediaSessionCompat.QueueItem> getPlayingQueue(String mediaId, MusicProvider musicProvider) {
         FireLog.d(TAG, "(++) getPlayingQueue: mediaId=" + mediaId);
+        FireLog.d(TAG, "(++) music provider list size " + musicProvider.getAllRetrievedMetadata().size());
         List<MediaMetadataCompat> tracks = musicProvider.getAllRetrievedMetadata();
-
         return convertToQueue(tracks);
     }
 
