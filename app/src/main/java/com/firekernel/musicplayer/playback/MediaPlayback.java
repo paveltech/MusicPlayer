@@ -66,10 +66,7 @@ public class MediaPlayback implements Playback {
     // Type of audio focus we have:
     private int currentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK;
     private SimpleExoPlayer simpleExoPlayer;
-
     private boolean exoPlayerNullIsStopped = false;
-
-
 
 
     private final BroadcastReceiver audioNoisyReceiver = new BroadcastReceiver() {
