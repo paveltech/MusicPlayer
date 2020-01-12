@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.firekernel.musicplayer.FirePopupMenuSelectedListener;
 import com.firekernel.musicplayer.R;
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.ui.fragment.MediaListFragment;
 import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.ImageHelper;
@@ -31,11 +32,11 @@ import java.util.List;
 public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyViewHolder> {
     private static final String TAG = FireLog.makeLogTag(MediaListAdapter.class);
     private Context context;
-    private List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
+    private ArrayList<SongItem> mediaItems = new ArrayList<>();
     private FirePopupMenuSelectedListener popupMenuSelectedListener;
     private MediaListFragment.OnMediaItemSelectedListener onMediaItemSelectedListener;
 
-    public MediaListAdapter(Context context, List<MediaBrowserCompat.MediaItem> mediaItems) {
+    public MediaListAdapter(Context context, ArrayList<SongItem> mediaItems) {
         this.context = context;
         this.mediaItems = mediaItems;
         if (context instanceof MediaListFragment.OnMediaItemSelectedListener) {
@@ -66,22 +67,22 @@ public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        MediaBrowserCompat.MediaItem mediaItem = mediaItems.get(position);
-        MediaDescriptionCompat description = mediaItem.getDescription();
-        holder.title.setText(description.getTitle());
-        holder.detail.setText(description.getSubtitle());
-        ImageHelper.loadArt(context, holder.albumArt, description);
-        setItemClickListener(holder, mediaItem);
-        setOnPopupMenuListener(holder, mediaItem);
+        SongItem songItem = mediaItems.get(position);
+
+        holder.title.setText(songItem.getTitle());
+        //holder.detail.setText(description.getSubtitle());
+        //ImageHelper.loadArt(context, holder.albumArt, description);
+        setItemClickListener(holder, songItem);
+        setOnPopupMenuListener(holder, songItem);
     }
 
-    public void refreshData(List<MediaBrowserCompat.MediaItem> data) {
+    public void refreshData(ArrayList<SongItem> data) {
         mediaItems.clear();
         mediaItems.addAll(data);
         notifyDataSetChanged();
     }
 
-    private void setItemClickListener(MyViewHolder myViewHolder, final MediaBrowserCompat.MediaItem mediaItem) {
+    private void setItemClickListener(MyViewHolder myViewHolder, SongItem mediaItem) {
         myViewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +91,7 @@ public class MediaListAdapter extends RecyclerView.Adapter<MediaListAdapter.MyVi
         });
     }
 
-    private void setOnPopupMenuListener(MyViewHolder myViewHolder, final MediaBrowserCompat.MediaItem mediaItem) {
+    private void setOnPopupMenuListener(MyViewHolder myViewHolder, SongItem mediaItem) {
         myViewHolder.popupMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

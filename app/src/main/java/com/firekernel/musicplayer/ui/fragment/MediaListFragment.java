@@ -17,12 +17,20 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.firekernel.musicplayer.R;
+import com.firekernel.musicplayer.api.ApiClient;
+import com.firekernel.musicplayer.api.ApiInterface;
 import com.firekernel.musicplayer.playback.MediaBrowserProvider;
+import com.firekernel.musicplayer.pojo.SongItem;
+import com.firekernel.musicplayer.pojo.SongResponse;
 import com.firekernel.musicplayer.ui.adapter.MediaListAdapter;
 import com.firekernel.musicplayer.utils.FireLog;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MediaListFragment extends Fragment {
     public static final String TAG = FireLog.makeLogTag(MediaListFragment.class);
@@ -32,15 +40,14 @@ public class MediaListFragment extends Fragment {
     private static final String EXTRA_MEDIA_ID = "media_id";
 
     private MediaListAdapter adapter;
-
-
+    public ApiInterface apiInterface;
     private final MediaBrowserCompat.SubscriptionCallback subscriptionCallback = new MediaBrowserCompat.SubscriptionCallback() {
         @Override
         public void onChildrenLoaded(@NonNull String parentId,
                                      @NonNull List<MediaBrowserCompat.MediaItem> children) {
             try {
                 FireLog.d(TAG, "(++) onChildrenLoaded, parentId=" + parentId + "  count=" + children.size());
-                loadView(children);
+                //loadView(children);
             } catch (Throwable t) {
                 FireLog.e(TAG, "Error onChildrenLoaded", t);
             }
@@ -53,7 +60,7 @@ public class MediaListFragment extends Fragment {
         }
     };
 
-    private List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
+    private ArrayList<SongItem> mediaItems = new ArrayList<>();
     private MediaBrowserProvider mediaBrowserProvider;
     private String title;
     private String mediaId;
@@ -100,11 +107,26 @@ public class MediaListFragment extends Fragment {
         FireLog.d(TAG, "(++) onCreateView");
         View view = inflater.inflate(R.layout.fragment_media_list, container, false);
         adapter = new MediaListAdapter(getContext(), mediaItems);
+        apiInterface = ApiClient.getRetrofitInstance().create(ApiInterface.class);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+
+        apiInterface.getSongs().enqueue(new Callback<SongResponse>() {
+            @Override
+            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                if (response.isSuccessful()){
+                    adapter.refreshData(response.body().getMusic());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SongResponse> call, Throwable t) {
+
+            }
+        });
 
         getActivity().setTitle(title);
         return view;
@@ -156,22 +178,11 @@ public class MediaListFragment extends Fragment {
         if (mediaId == null) {
             mediaId = mediaBrowserProvider.getMediaBrowser().getRoot();
         }
-
-        // Unsubscribing before subscribing is required if this mediaId already has a subscriber
-        // on this MediaBrowser instance. Subscribing to an already subscribed mediaId will replace
-        // the callback, but won't trigger the initial callback.onChildrenLoaded.
-        //
-        // This is temporary: A bug is being fixed that will make subscribe
-        // consistently call onChildrenLoaded initially, no matter if it is replacing an existing
-        // subscriber or not. Currently this only happens if the mediaID has no previous
-        // subscriber or if the media content changes on the service side, so we need to
-        // unsubscribe first.
-
         mediaBrowserProvider.getMediaBrowser().unsubscribe(mediaId);
         mediaBrowserProvider.getMediaBrowser().subscribe(mediaId, subscriptionCallback);
     }
 
-    private void loadView(List<MediaBrowserCompat.MediaItem> mediaItems) {
+    private void loadView(ArrayList<SongItem> mediaItems) {
         // not taking care of recyclerView visibility
         if (mediaItems == null || mediaItems.size() == 0) {
             getView().findViewById(R.id.error_view).setVisibility(View.VISIBLE);
@@ -182,7 +193,7 @@ public class MediaListFragment extends Fragment {
     }
 
     public interface OnMediaItemSelectedListener {
-        void onMediaItemSelected(MediaBrowserCompat.MediaItem item);
+        void onMediaItemSelected(SongItem item);
     }
 
 }

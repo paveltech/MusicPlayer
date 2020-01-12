@@ -2,32 +2,22 @@ package com.firekernel.musicplayer.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.fragment.app.Fragment;
-
-import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.text.TextUtils;
+import android.view.MenuItem;
+import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
-
-import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
+import androidx.fragment.app.Fragment;
 
 import com.firekernel.musicplayer.FirePopupMenuSelectedListener;
 import com.firekernel.musicplayer.R;
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.ui.fragment.MediaListFragment;
 import com.firekernel.musicplayer.ui.fragment.PlaybackControlsFragment;
 import com.firekernel.musicplayer.utils.ActionHelper;
@@ -74,7 +64,7 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListFragm
 
         if (savedInstanceState == null) {
             // Set the default view when activity is launched on the first time
-            loadPrimaryView();
+            openFragment();
             // Only check if a Now Playing is needed on the first time
             ActionHelper.startNowPlayingActivityIfNeeded(this, getIntent());
         }
@@ -142,26 +132,24 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListFragm
 
 
     @Override
-    public void onMediaItemSelected(MediaBrowserCompat.MediaItem item) {
+    public void onMediaItemSelected(SongItem item) {
         FireLog.d(TAG, "(++) onMediaItemSelected, mediaitem=" + item);
-        if (item.isPlayable()) {
-            MediaControllerCompat.getMediaController(this).getTransportControls()
+
+        MediaControllerCompat.getMediaController(this).getTransportControls()
                     .playFromMediaId("103000", null);
-        }
+
     }
 
     @Override
-    public void onPlaySelected(MediaBrowserCompat.MediaItem item) {
+    public void onPlaySelected(SongItem item) {
         FireLog.d(TAG, "(++) onPlaySelected");
-        if (item.isPlayable()) {
             MediaControllerCompat.getMediaController(this).getTransportControls()
-                    .playFromMediaId(item.getMediaId(), null);
-        }
+                    .playFromMediaId("" + item.getDuration(), null);
     }
 
     @Override
-    public void onShareSelected(MediaBrowserCompat.MediaItem item) {
-        ActionHelper.shareTrack(this, item.getDescription());
+    public void onShareSelected(SongItem item) {
+
     }
 
 
@@ -174,12 +162,7 @@ public class MainActivity extends PlaybackBaseActivity implements MediaListFragm
         return (PlaybackControlsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_playback_controls);
     }
 
-    private void loadPrimaryView() {
-        FireLog.d(TAG, "(++) loadPrimaryView");
-        onNavigationItemSelectedForFragment(R.id.nav_tracks);
-    }
-
-    private void onNavigationItemSelectedForFragment(int id) {
+    private void openFragment() {
 
         Fragment fragment = null;
         String tag = null;
