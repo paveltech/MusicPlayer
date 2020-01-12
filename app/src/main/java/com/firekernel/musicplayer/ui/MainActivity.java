@@ -6,9 +6,6 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
-import com.firekernel.musicplayer.api.ApiClient;
-import com.firekernel.musicplayer.api.ApiInterface;
-import com.firekernel.musicplayer.pojo.SongResponse;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.fragment.app.Fragment;
@@ -38,12 +35,7 @@ import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.ImageHelper;
 import com.firekernel.musicplayer.utils.MediaIDHelper;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
-
-public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener {
+public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener {
 
     private static final String TAG = FireLog.makeLogTag(MainActivity.class);
 
@@ -55,7 +47,7 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
     private String title;
     private int itemId;
     private String mArtUrl = ""; //do not set null
-    private ApiInterface apiInterface;
+
 
 
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
@@ -84,8 +76,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
 
         bgView = (ImageView) findViewById(R.id.bgView);
 //        ImageHelper.loadBlurBg(this, bgView);
-
-        apiInterface = ApiClient.getRetrofitInstance().create(ApiInterface.class);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -203,6 +193,22 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         }
     }
 
+    @Override
+    public void onPlaySelected(MediaBrowserCompat.MediaItem item) {
+        FireLog.d(TAG, "(++) onPlaySelected");
+        if (item.isPlayable()) {
+            MediaControllerCompat.getMediaController(this).getTransportControls()
+                    .playFromMediaId(item.getMediaId(), null);
+        }
+    }
+
+    @Override
+    public void onShareSelected(MediaBrowserCompat.MediaItem item) {
+        ActionHelper.shareTrack(this, item.getDescription());
+//        ActionHelper.shareTrack(this, item.getDescription().getMediaId());
+    }
+
+
 
     private MediaListFragment getMediaListFragment() {
         return (MediaListFragment) getSupportFragmentManager().findFragmentByTag(MediaListFragment.TAG);
@@ -316,23 +322,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
             ImageHelper.loadBlurBg(this, bgView, metadata.getDescription());
             ImageHelper.loadBlurBg(this, headerBgView, metadata.getDescription());
         }
-    }
-
-    private void apiCall() {
-        Call<SongResponse> songResponseCall = apiInterface.getSongs();
-        songResponseCall.enqueue(new Callback<SongResponse>() {
-            @Override
-            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
-                if (response.isSuccessful()) {
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SongResponse> call, Throwable t) {
-
-            }
-        });
     }
 
 }
