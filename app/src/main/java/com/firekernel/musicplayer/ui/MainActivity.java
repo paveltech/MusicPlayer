@@ -35,19 +35,14 @@ import com.firekernel.musicplayer.utils.FireLog;
 import com.firekernel.musicplayer.utils.ImageHelper;
 import com.firekernel.musicplayer.utils.MediaIDHelper;
 
-public class MainActivity extends PlaybackBaseActivity implements NavigationView.OnNavigationItemSelectedListener, MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener {
+public class MainActivity extends PlaybackBaseActivity implements MediaListFragment.OnMediaItemSelectedListener, FirePopupMenuSelectedListener {
 
     private static final String TAG = FireLog.makeLogTag(MainActivity.class);
 
     private ImageView headerBgView;
     private ImageView bgView;
-    private DrawerLayout drawer;
-    private NavigationView navigationView;
-    private View headerView;
     private String title;
-    private int itemId;
     private String mArtUrl = ""; //do not set null
-
 
 
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
@@ -75,26 +70,7 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         setSupportActionBar(toolbar);
 
         bgView = (ImageView) findViewById(R.id.bgView);
-//        ImageHelper.loadBlurBg(this, bgView);
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        headerView = navigationView.getHeaderView(0);
-        headerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onNavigationItemSelected(v.getId());
-            }
-        });
-
-        loadNavigationHeaderView(headerView);
 
         if (savedInstanceState == null) {
             // Set the default view when activity is launched on the first time
@@ -120,13 +96,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         FireLog.d(TAG, "(++) onNewIntent, intent=" + intent);
         ActionHelper.startNowPlayingActivityIfNeeded(this, intent);
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -158,15 +127,10 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
     @Override
     protected void onMediaControllerConnected() {
 
-
-        // connect MediaListFragment
-
-
         Fragment fragment = getMediaListFragment();
         if (fragment != null) {
             ((MediaListFragment) fragment).onConnected();
         }
-
 
         Fragment fragmentControl = getControlFragment();
         if (fragmentControl != null) {
@@ -174,13 +138,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         }
 
         this.onConnected();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        onNavigationItemSelected(id);
-        return true;
     }
 
 
@@ -205,7 +162,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
     @Override
     public void onShareSelected(MediaBrowserCompat.MediaItem item) {
         ActionHelper.shareTrack(this, item.getDescription());
-//        ActionHelper.shareTrack(this, item.getDescription().getMediaId());
     }
 
 
@@ -223,65 +179,14 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
         onNavigationItemSelectedForFragment(R.id.nav_tracks);
     }
 
-    /**
-     * Responsible for showing appropriate content in navigation header view ie current user
-     *
-     * @param headerView
-     */
-    private void loadNavigationHeaderView(final View headerView) {
-        FireLog.d(TAG, "(++) loadNavigationHeaderView");
-
-        if (headerView == null) {
-            return;
-        }
-
-        headerBgView = (ImageView) headerView.findViewById(R.id.bgView);
-    }
-
-    private void onNavigationItemSelected(final int id) {
-        FireLog.d(TAG, "(++) onNavigationItemSelected, id=" + id);
-        drawer.closeDrawer(GravityCompat.START);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                switch (id) {
-                    case R.id.nav_header:
-                    case R.id.nav_playlist:
-                    case R.id.nav_tracks:
-                    case R.id.nav_albums:
-                    case R.id.nav_artists:
-                    case R.id.nav_genres:
-                    case R.id.nav_folders:
-                        onNavigationItemSelectedForFragment(id);
-                        break;
-                }
-            }
-        }, 300);
-    }
-
     private void onNavigationItemSelectedForFragment(int id) {
-        if (id == itemId) {
-            return;
-        }
-        itemId = id;
+
         Fragment fragment = null;
         String tag = null;
 
-        switch (id) {
-
-            case R.id.nav_tracks:
-                title = getResources().getString(R.string.nav_menu_tracks);
-                fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS_ALL);
-                tag = MediaListFragment.TAG;
-                break;
-
-        }
-
-        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-            getSupportFragmentManager().popBackStack();
-        }
-
+        title = getResources().getString(R.string.nav_menu_tracks);
+        fragment = MediaListFragment.newInstance(title, MediaIDHelper.MEDIA_ID_TRACKS_ALL);
+        tag = MediaListFragment.TAG;
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
@@ -311,7 +216,6 @@ public class MainActivity extends PlaybackBaseActivity implements NavigationView
             return;
         }
 
-        // metadata change is called so frequent// preventing image loading
         String artUrl = null;
         if (metadata.getDescription().getIconUri() != null) {
             artUrl = metadata.getDescription().getIconUri().toString();
