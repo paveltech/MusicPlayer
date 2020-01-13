@@ -28,16 +28,16 @@ import static com.firekernel.musicplayer.source.RemoteSource.basePath;
 public class MusicProvider {
     private static final String TAG = FireLog.makeLogTag(MusicProvider.class);
 
-    private final CopyOnWriteArrayList<MediaMetadataCompat> musicList;
-    private final CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
+    private CopyOnWriteArrayList<MediaMetadataCompat> musicList;
+    private CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
 
 
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-    public ArrayList<SongItem> songItems;
+    public ArrayList<SongItem> songItemArrayList;
 
 
     public MusicProvider(ArrayList<SongItem> songItemArrayList) {
-        this.songItems = songItemArrayList;
+        this.songItemArrayList = songItemArrayList;
         musicList = new CopyOnWriteArrayList<>();
         mediaList = new CopyOnWriteArrayList<>();
     }
@@ -47,11 +47,33 @@ public class MusicProvider {
      * for future reference, keying tracks by musicId and grouping by genre.
      */
 
-    private synchronized boolean retrieveMedia(String mediaId) {
+    @SuppressLint("StaticFieldLeak")
+    public void retrieveMediaAsync(final String mediaId, final Callback callback) {
+        FireLog.d(TAG, "(++) retrieveMediaAsync");
+        // Asynchronously load the music catalog in a separate thread
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                return retrieveMedia();
+            }
+
+            @Override
+            protected void onPostExecute(Boolean initialized) {
+                if (callback != null) {
+                    callback.onMusicCatalogReady(initialized);
+                }
+            }
+        }.executeOnExecutor(executorService);
+    }
+
+    private synchronized boolean retrieveMedia() {
         boolean initialized = false;
         mediaList.clear();
+
+        FireLog.d(TAG, "++ retrieve song size " + songItemArrayList.size());
+
         try {
-            Iterator<MediaMetadataCompat> tracks = iterator(songItems);
+            Iterator<MediaMetadataCompat> tracks = iterator(songItemArrayList);
             while (tracks.hasNext()) {
                 MediaMetadataCompat item = tracks.next();
                 mediaList.add(item);
@@ -82,6 +104,12 @@ public class MusicProvider {
         }
         return result;
     }
+
+    /*
+    public static MusicProvider getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+     */
 
     private MediaBrowserCompat.MediaItem createTracksMediaItem(MediaMetadataCompat metadata) {
         // Since mediaMetadata fields are immutable, we need to create a copy, so we
@@ -117,7 +145,6 @@ public class MusicProvider {
     public Iterator<MediaMetadataCompat> iterator(ArrayList<SongItem> songItemArrayList) {
 
         ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
-        Timber.d("list size " + songItemArrayList.size());
         for (int j = 0; j < songItemArrayList.size(); j++) {
             SongItem songItem = songItemArrayList.get(j);
             tracks.add(buildFromJSON(songItem));
@@ -158,5 +185,11 @@ public class MusicProvider {
                 .build();
     }
 
+    /*
+    private static class LazyHolder {
+        public static final MusicProvider INSTANCE = new MusicProvider();
+    }
+
+     */
 
 }
