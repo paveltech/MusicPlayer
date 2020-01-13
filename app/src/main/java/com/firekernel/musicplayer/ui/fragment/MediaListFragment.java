@@ -1,17 +1,11 @@
 package com.firekernel.musicplayer.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.preference.PreferenceManager;
 import android.support.v4.media.MediaBrowserCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,10 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.firekernel.musicplayer.R;
 import com.firekernel.musicplayer.api.ApiClient;
 import com.firekernel.musicplayer.api.ApiInterface;
 import com.firekernel.musicplayer.playback.MediaBrowserProvider;
+import com.firekernel.musicplayer.playback.MusicPlayerService;
 import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.pojo.SongResponse;
 import com.firekernel.musicplayer.ui.adapter.MediaListAdapter;
@@ -124,7 +126,7 @@ public class MediaListFragment extends Fragment {
             public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
                 if (response.isSuccessful()){
                     loadView(response.body().getMusic());
-                    saveArrayList(response.body().getMusic() , "music");
+                    startService(response.body().getMusic());
                 }
             }
 
@@ -138,13 +140,11 @@ public class MediaListFragment extends Fragment {
         return view;
     }
 
-    public void saveArrayList(ArrayList<SongItem> list, String key){
+    public String makeJsonString(ArrayList<SongItem> list) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = prefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();     // This line is IMPORTANT !!!
+        return json;
     }
 
 
@@ -210,6 +210,12 @@ public class MediaListFragment extends Fragment {
 
     public interface OnMediaItemSelectedListener {
         void onMediaItemSelected(SongItem item);
+    }
+
+    public void startService(ArrayList<SongItem> songItemArrayList) {
+        Intent intent = new Intent(getActivity(), MusicPlayerService.class);
+        intent.putExtra("array", makeJsonString(songItemArrayList));
+        getActivity().startService(intent);
     }
 
 }

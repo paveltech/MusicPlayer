@@ -1,10 +1,12 @@
 package com.firekernel.musicplayer.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SongItem {
-
+public class SongItem implements Parcelable {
 
     @SerializedName("title")
     @Expose
@@ -36,6 +38,31 @@ public class SongItem {
     @SerializedName("site")
     @Expose
     private String site;
+
+    protected SongItem(Parcel in) {
+        title = in.readString();
+        album = in.readString();
+        artist = in.readString();
+        genre = in.readString();
+        source = in.readString();
+        image = in.readString();
+        trackNumber = in.readInt();
+        totalTrackCount = in.readInt();
+        duration = in.readInt();
+        site = in.readString();
+    }
+
+    public static final Creator<SongItem> CREATOR = new Creator<SongItem>() {
+        @Override
+        public SongItem createFromParcel(Parcel in) {
+            return new SongItem(in);
+        }
+
+        @Override
+        public SongItem[] newArray(int size) {
+            return new SongItem[size];
+        }
+    };
 
     public String getTitle() {
         return title;
@@ -115,5 +142,24 @@ public class SongItem {
 
     public void setSite(String site) {
         this.site = site;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(title);
+        parcel.writeString(album);
+        parcel.writeString(artist);
+        parcel.writeString(genre);
+        parcel.writeString(source);
+        parcel.writeString(image);
+        parcel.writeInt(trackNumber);
+        parcel.writeInt(totalTrackCount);
+        parcel.writeInt(duration);
+        parcel.writeString(site);
     }
 }

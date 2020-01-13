@@ -5,19 +5,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
-import androidx.annotation.NonNull;
 import android.support.v4.media.MediaBrowserCompat.MediaItem;
-import androidx.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import androidx.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
+import androidx.annotation.NonNull;
+import androidx.media.MediaBrowserServiceCompat;
+import androidx.media.session.MediaButtonReceiver;
+
 import com.firekernel.musicplayer.R;
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.source.MusicProvider;
 import com.firekernel.musicplayer.utils.FireLog;
-
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MusicPlayerService extends MediaBrowserServiceCompat implements
@@ -39,9 +45,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     private PlaybackManager playbackManager;
     private MediaSessionCompat session;
     private MediaNotificationManager mediaNotificationManager;
-
-
-
+    private ArrayList<SongItem> songItemArrayList;
 
     private QueueManager.MetadataUpdateListener metadataUpdateListener = new QueueManager.MetadataUpdateListener() {
 
@@ -73,24 +77,11 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         super.onCreate();
         FireLog.d(TAG, "(++) onCreate");
 
+        delayedStopHandler.removeCallbacksAndMessages(null);
+        delayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
         // Start a new MediaSession
         session = new MediaSessionCompat(this, MusicPlayerService.class.getSimpleName());
         setSessionToken(session.getSessionToken());
-
-        musicProvider = MusicProvider.getInstance();
-
-        QueueManager queueManager = new QueueManager(musicProvider, metadataUpdateListener);
-        MediaPlayback playback = new MediaPlayback(this);
-
-        playbackManager = new PlaybackManager(this, queueManager, playback);
-
-        session.setCallback(playbackManager.getMediaSessionCallback());
-
-        session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        playbackManager.updatePlaybackState(null);
-
         try {
             mediaNotificationManager = new MediaNotificationManager(this);
         } catch (RemoteException e) {
@@ -101,6 +92,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     @Override
     public int onStartCommand(Intent startIntent, int flags, int startId) {
         FireLog.d(TAG, "(++) onStartCommand, startIntent=" + startIntent + ", flags=" + flags + ", startId=" + startId);
+
         if (startIntent != null) {
             String action = startIntent.getAction();
             String command = startIntent.getStringExtra(CMD_NAME);
@@ -113,10 +105,16 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
                 MediaButtonReceiver.handleIntent(session, startIntent);
             }
         }
+
+        String extraString = startIntent.getExtras().getString("array");
+        songItemArrayList = getArrayList(extraString);
+
+        FireLog.d(TAG, "extra array size " + songItemArrayList.size());
+
         // Reset the delay handler to enqueue a message to stop the service if
         // nothing is playing.
-        delayedStopHandler.removeCallbacksAndMessages(null);
-        delayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
+
+
         return START_STICKY;
     }
 
@@ -146,12 +144,20 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     @Override
     public void onLoadChildren(@NonNull final String parentMediaId, @NonNull final Result<List<MediaItem>> result) {
         result.detach();
-        musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
-            @Override
-            public void onMusicCatalogReady(boolean success) {
-                result.sendResult(musicProvider.getChildren(parentMediaId));
-            }
-        });
+        musicProvider = new MusicProvider(songItemArrayList);
+
+        QueueManager queueManager = new QueueManager(musicProvider, metadataUpdateListener);
+        MediaPlayback playback = new MediaPlayback(this);
+
+        playbackManager = new PlaybackManager(this, queueManager, playback);
+        session.setCallback(playbackManager.getMediaSessionCallback());
+
+        session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        playbackManager.updatePlaybackState(null);
+        FireLog.d(TAG, "children size: " + musicProvider.getChildren().size());
+        result.sendResult(musicProvider.getChildren());
     }
 
 
@@ -211,5 +217,13 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
                 service.stopSelf();
             }
         }
+    }
+
+    public ArrayList<SongItem> getArrayList(String jsonData) {
+        Gson gson = new Gson();
+        String json = jsonData;
+        Type type = new TypeToken<ArrayList<SongItem>>() {
+        }.getType();
+        return gson.fromJson(json, type);
     }
 }

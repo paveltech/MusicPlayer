@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.utils.FireLog;
 
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import timber.log.Timber;
+
+import static com.firekernel.musicplayer.source.RemoteSource.basePath;
 
 
 /**
@@ -28,23 +31,15 @@ public class MusicProvider {
     private final CopyOnWriteArrayList<MediaMetadataCompat> musicList;
     private final CopyOnWriteArrayList<MediaMetadataCompat> mediaList;
 
+
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private MusicProviderSource remoteSource;
+    public ArrayList<SongItem> songItems;
 
 
-    private MusicProvider() {
-        // not following the adapter pattern
-        this(new RemoteSource());
-    }
-
-    private MusicProvider(MusicProviderSource remoteSource) {
-        this.remoteSource = remoteSource;
+    public MusicProvider(ArrayList<SongItem> songItemArrayList) {
+        this.songItems = songItemArrayList;
         musicList = new CopyOnWriteArrayList<>();
         mediaList = new CopyOnWriteArrayList<>();
-    }
-
-    public static MusicProvider getInstance() {
-        return LazyHolder.INSTANCE;
     }
 
     /**
@@ -52,30 +47,11 @@ public class MusicProvider {
      * for future reference, keying tracks by musicId and grouping by genre.
      */
 
-    @SuppressLint("StaticFieldLeak")
-    public void retrieveMediaAsync(final String mediaId, final Callback callback) {
-        FireLog.d(TAG, "(++) retrieveMediaAsync");
-        // Asynchronously load the music catalog in a separate thread
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                return retrieveMedia(mediaId);
-            }
-
-            @Override
-            protected void onPostExecute(Boolean initialized) {
-                if (callback != null) {
-                    callback.onMusicCatalogReady(initialized);
-                }
-            }
-        }.executeOnExecutor(executorService);
-    }
-
     private synchronized boolean retrieveMedia(String mediaId) {
         boolean initialized = false;
         mediaList.clear();
         try {
-            Iterator<MediaMetadataCompat> tracks = remoteSource.iterator(mediaId);
+            Iterator<MediaMetadataCompat> tracks = iterator(songItems);
             while (tracks.hasNext()) {
                 MediaMetadataCompat item = tracks.next();
                 mediaList.add(item);
@@ -87,10 +63,7 @@ public class MusicProvider {
         return initialized;
     }
 
-    public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
-        FireLog.d(TAG, "(++) getChildren, mediaId=" + mediaId);
-
-
+    public List<MediaBrowserCompat.MediaItem> getChildren() {
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
         // fill the music List once and keep ever
 
@@ -141,7 +114,49 @@ public class MusicProvider {
     }
 
 
-    private static class LazyHolder {
-        public static final MusicProvider INSTANCE = new MusicProvider();
+    public Iterator<MediaMetadataCompat> iterator(ArrayList<SongItem> songItemArrayList) {
+
+        ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
+        Timber.d("list size " + songItemArrayList.size());
+        for (int j = 0; j < songItemArrayList.size(); j++) {
+            SongItem songItem = songItemArrayList.get(j);
+            tracks.add(buildFromJSON(songItem));
+        }
+
+        return tracks.iterator();
+
     }
+
+
+    private MediaMetadataCompat buildFromJSON(SongItem songItem) {
+        String title = songItem.getTitle();
+        String album = songItem.getAlbum();
+        String artist = songItem.getArtist();
+        String genre = songItem.getGenre();
+        String source = "https://vod.rockerzs.com/music/numb/master.m3u8";
+        String iconUrl = basePath + songItem.getImage();
+        int trackNumber = songItem.getTrackNumber();
+        int totalTrackCount = songItem.getTotalTrackCount();
+        int duration = songItem.getDuration() * 1000; // ms
+
+        // Since we don't have a unique ID in the server, we fake one using the hashcode of
+        // the music source. In a real world app, this could come from the server.
+        String id = "" + duration;
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
+//                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
+                //.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, "https://vod.rockerzs.com/music/numb/master.m3u8")
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, iconUrl)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTrackCount)
+                .build();
+    }
+
+
 }
