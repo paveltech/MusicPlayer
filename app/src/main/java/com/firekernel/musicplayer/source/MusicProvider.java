@@ -81,8 +81,8 @@ public class MusicProvider {
         return initialized;
     }
 
-    public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
-        FireLog.d(TAG, "(++) getChildren, mediaId=" + mediaId);
+    public List<MediaBrowserCompat.MediaItem> getChildren() {
+        FireLog.d(TAG, "(++) getChildren, mediaId=");
 
 
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
@@ -135,7 +135,6 @@ public class MusicProvider {
     }
 
     public Iterator<MediaMetadataCompat> iterator(ArrayList<SongItem> songItemArrayList) {
-
         ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
         Timber.d("list size " + songItemArrayList.size());
         for (int j = 0; j < songItemArrayList.size(); j++) {

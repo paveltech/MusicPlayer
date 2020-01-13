@@ -218,4 +218,13 @@ public class MediaListFragment extends Fragment {
 
     }
 
+    public void saveArrayList(ArrayList<SongItem> list, String key){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();     // This line is IMPORTANT !!!
+    }
+
 }

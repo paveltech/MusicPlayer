@@ -26,7 +26,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.firekernel.musicplayer.source.RemoteSource.basePath;
 
 public class MusicPlayerService extends MediaBrowserServiceCompat implements
         PlaybackManager.MusicPlayerServiceCallback {
@@ -87,11 +86,10 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         FireLog.d(TAG, "(++) onStartCommand, startIntent=" + startIntent + ", flags=" + flags + ", startId=" + startId);
         FireLog.d(TAG , "on startcommand call");
 
-
         String data = startIntent.getStringExtra("array");
-
         songItemArrayList = getArrayList(data);
         musicProvider = new MusicProvider(songItemArrayList);
+        musicProvider.getChildren();
 
         if (session!=null){
             if (!session.isActive()){
@@ -169,11 +167,11 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         result.detach();
         FireLog.d(TAG, "(++) onLoadChildren");
 
-
+        result.sendResult(null);
         musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
             @Override
             public void onMusicCatalogReady(boolean success) {
-                result.sendResult(musicProvider.getChildren(parentMediaId));
+
             }
         });
     }
