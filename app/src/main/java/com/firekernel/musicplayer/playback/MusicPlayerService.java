@@ -5,20 +5,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
-import androidx.annotation.NonNull;
 import android.support.v4.media.MediaBrowserCompat.MediaItem;
-import androidx.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import androidx.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
+import androidx.annotation.NonNull;
+import androidx.media.MediaBrowserServiceCompat;
+import androidx.media.session.MediaButtonReceiver;
+
 import com.firekernel.musicplayer.R;
+import com.firekernel.musicplayer.pojo.SongItem;
 import com.firekernel.musicplayer.source.MusicProvider;
 import com.firekernel.musicplayer.utils.FireLog;
-
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.firekernel.musicplayer.source.RemoteSource.basePath;
 
 public class MusicPlayerService extends MediaBrowserServiceCompat implements
         PlaybackManager.MusicPlayerServiceCallback {
@@ -27,21 +35,16 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     public static final String CMD_NAME = "CMD_NAME";
     public static final String CMD_PAUSE = "CMD_PAUSE";
 
-
-
     private static final String TAG = FireLog.makeLogTag(MusicPlayerService.class);
-
 
     // Delay stopSelf by using a handler.
     private static final int STOP_DELAY = 10 * 1000; //10 seconds
     private final DelayedStopHandler delayedStopHandler = new DelayedStopHandler(this);
-    private MusicProvider musicProvider;
     private PlaybackManager playbackManager;
     private MediaSessionCompat session;
     private MediaNotificationManager mediaNotificationManager;
-
-
-
+    private ArrayList<SongItem> songItemArrayList;
+    public MusicProvider musicProvider;
 
     private QueueManager.MetadataUpdateListener metadataUpdateListener = new QueueManager.MetadataUpdateListener() {
 
@@ -52,8 +55,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
 
         @Override
         public void onMetadataRetrieveError() {
-            playbackManager.updatePlaybackState(
-                    getString(R.string.error_no_metadata));
+            playbackManager.updatePlaybackState(getString(R.string.error_no_metadata));
         }
 
         @Override
@@ -68,16 +70,38 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     };
 
 
+    /*
     @Override
     public void onCreate() {
         super.onCreate();
         FireLog.d(TAG, "(++) onCreate");
-
         // Start a new MediaSession
-        session = new MediaSessionCompat(this, MusicPlayerService.class.getSimpleName());
-        setSessionToken(session.getSessionToken());
+    }
 
-        musicProvider = MusicProvider.getInstance();
+     */
+
+
+
+    @Override
+    public int onStartCommand(Intent startIntent, int flags, int startId) {
+        FireLog.d(TAG, "(++) onStartCommand, startIntent=" + startIntent + ", flags=" + flags + ", startId=" + startId);
+        FireLog.d(TAG , "on startcommand call");
+
+
+        String data = startIntent.getStringExtra("array");
+
+        songItemArrayList = getArrayList(data);
+        musicProvider = new MusicProvider(songItemArrayList);
+
+        if (session!=null){
+            if (!session.isActive()){
+                session = new MediaSessionCompat(this, MusicPlayerService.class.getSimpleName());
+                setSessionToken(session.getSessionToken());
+            }
+        }else {
+            session = new MediaSessionCompat(this, MusicPlayerService.class.getSimpleName());
+            setSessionToken(session.getSessionToken());
+        }
 
         QueueManager queueManager = new QueueManager(musicProvider, metadataUpdateListener);
         MediaPlayback playback = new MediaPlayback(this);
@@ -91,16 +115,13 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
 
         playbackManager.updatePlaybackState(null);
 
+
         try {
             mediaNotificationManager = new MediaNotificationManager(this);
         } catch (RemoteException e) {
             throw new IllegalStateException("Could not create a MediaNotificationManager", e);
         }
-    }
 
-    @Override
-    public int onStartCommand(Intent startIntent, int flags, int startId) {
-        FireLog.d(TAG, "(++) onStartCommand, startIntent=" + startIntent + ", flags=" + flags + ", startId=" + startId);
         if (startIntent != null) {
             String action = startIntent.getAction();
             String command = startIntent.getStringExtra(CMD_NAME);
@@ -146,6 +167,9 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
     @Override
     public void onLoadChildren(@NonNull final String parentMediaId, @NonNull final Result<List<MediaItem>> result) {
         result.detach();
+        FireLog.d(TAG, "(++) onLoadChildren");
+
+
         musicProvider.retrieveMediaAsync(parentMediaId, new MusicProvider.Callback() {
             @Override
             public void onMusicCatalogReady(boolean success) {
@@ -154,8 +178,6 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         });
     }
 
-
-
     @Override
     public void onPlaybackStart() {
         FireLog.d(TAG, "(++) onPlaybackStart");
@@ -163,8 +185,6 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
         delayedStopHandler.removeCallbacksAndMessages(null);
         startService(new Intent(getApplicationContext(), MusicPlayerService.class));
     }
-
-
 
     @Override
     public void onNotificationRequired() {
@@ -212,4 +232,15 @@ public class MusicPlayerService extends MediaBrowserServiceCompat implements
             }
         }
     }
+
+    public ArrayList<SongItem> getArrayList(String key) {
+        Gson gson = new Gson();
+        String json = key;
+        Type type = new TypeToken<ArrayList<SongItem>>() {
+        }.getType();
+        return gson.fromJson(json, type);
+    }
+
+
+
 }

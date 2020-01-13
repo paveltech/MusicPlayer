@@ -22,22 +22,9 @@ import timber.log.Timber;
  */
 
 
-public class RemoteSource implements MusicProviderSource {
+public class RemoteSource {
 
-    protected static final String basePath = "http://storage.googleapis.com/automotive-media/";
-    protected static final String CATALOG_URL = "http://storage.googleapis.com/automotive-media/music.json";
-    private static final String TAG = FireLog.makeLogTag(RemoteSource.class);
-    private static final String JSON_MUSIC = "music";
-    private static final String JSON_TITLE = "title";
-    private static final String JSON_ALBUM = "album";
-    private static final String JSON_ARTIST = "artist";
-    private static final String JSON_GENRE = "genre";
-    private static final String JSON_SOURCE = "source";
-    private static final String JSON_IMAGE = "image";
-    private static final String JSON_TRACK_NUMBER = "trackNumber";
-    private static final String JSON_TOTAL_TRACK_COUNT = "totalTrackCount";
-    private static final String JSON_DURATION = "duration";
-
+    public static String basePath = "http://storage.googleapis.com/automotive-media/";
 
     public ArrayList<SongItem> getArrayList(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(FireApplication.getInstance().getApplicationContext());
@@ -48,53 +35,11 @@ public class RemoteSource implements MusicProviderSource {
         return gson.fromJson(json, type);
     }
 
-    @Override
-    public Iterator<MediaMetadataCompat> iterator(String mediaId) {
+
+}
 
 
-        ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
-        ArrayList<SongItem> songItemArrayList = getArrayList("music");
 
-        Timber.d("list size "+songItemArrayList.size());
-        for (int j = 0; j < songItemArrayList.size(); j++) {
-            SongItem songItem = songItemArrayList.get(j);
-            tracks.add(buildFromJSON(songItem));
-            }
-
-        return tracks.iterator();
-
-    }
-
-
-    private MediaMetadataCompat buildFromJSON(SongItem songItem) {
-        String title = songItem.getTitle();
-        String album = songItem.getAlbum();
-        String artist = songItem.getArtist();
-        String genre = songItem.getGenre();
-        String source = "https://vod.rockerzs.com/music/numb/master.m3u8";
-        String iconUrl = basePath + songItem.getImage();
-        int trackNumber = songItem.getTrackNumber();
-        int totalTrackCount = songItem.getTotalTrackCount();
-        int duration = songItem.getDuration() * 1000; // ms
-
-        // Since we don't have a unique ID in the server, we fake one using the hashcode of
-        // the music source. In a real world app, this could come from the server.
-        String id = "" + duration;
-        return new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
-//                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, source)
-                //.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, "https://vod.rockerzs.com/music/numb/master.m3u8")
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
-                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, iconUrl)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
-                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTrackCount)
-                .build();
-    }
 
 
 
@@ -187,4 +132,3 @@ public class RemoteSource implements MusicProviderSource {
     }
 
      */
-}
